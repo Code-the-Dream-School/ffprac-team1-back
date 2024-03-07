@@ -24,7 +24,7 @@ app.use(favicon(__dirname + "/public/favicon.ico"))
 
 // routes
 app.use("/api/v1", mainRouter)
-app.use("/api/v1/users", userRouter)
+app.use("/api/v1", userRouter)
 
 // Start the server
 const PORT = process.env.PORT || 3000

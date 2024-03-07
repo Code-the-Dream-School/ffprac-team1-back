@@ -3,6 +3,9 @@ const router = express.Router()
 const userController = require("../controllers/userController")
 
 // POST /api/v1/register
-router.post("/register", userController.registerUser)
+router.post("/register", (req, res) => {
+  console.log("Received a registration request")
+  userController.registerUser(req, res)
+})
 
 module.exports = router
