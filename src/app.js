@@ -1,3 +1,5 @@
+require("dotenv").config()
+
 const express = require("express")
 const mongoose = require("mongoose")
 const app = express()
@@ -9,7 +11,8 @@ const mainRouter = require("./routes/mainRouter.js")
 const userRouter = require("./routes/userRouter")
 
 // Connect to MongoDB
-mongoose.connect("mongodb://localhost/your_database_name", {})
+const connectDB = require("./db/db")
+connectDB()
 
 // middleware
 app.use(cors())
