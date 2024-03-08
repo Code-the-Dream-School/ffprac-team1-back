@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 const TechnologiesSchema = require('./technologiesSchema'); 
 
 const ProjectSchema = new mongoose.Schema({
-  creatorId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'User' 
-  },
   title: {
     type: String,
     required: true
@@ -48,7 +43,12 @@ const ProjectSchema = new mongoose.Schema({
   participants: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User' 
-  }]
+  }],
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'Please provide a user'],
+  },
 }, { timestamps: true }); 
 
 const ProjectModel = mongoose.model('Project', ProjectSchema, 'Projects');
