@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const TechnologiesSchema = require('./technologiesSchema'); 
+const TechnologiesSchema = require('./Technologies'); 
 
 const ProjectSchema = new mongoose.Schema({
   title: {
@@ -36,19 +36,19 @@ const ProjectSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  applicants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User' 
-  }],
-  participants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User' 
-  }],
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'Please provide a user'],
-  },
+  // applicants: [{
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'User' 
+  // }],
+  // participants: [{
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'User' 
+  // }],
+  // createdBy: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'User',
+  //   required: [true, 'Please provide a user'],
+  // },
 }, { timestamps: true }); 
 
 const ProjectModel = mongoose.model('Project', ProjectSchema, 'Projects');
