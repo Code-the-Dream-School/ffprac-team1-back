@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const TechnologiesSchema = require('./Technologies'); 
+const mongoose = require("mongoose");
+const TechnologiesSchema = require("./Technologies"); 
 
 const ProjectSchema = new mongoose.Schema({
   title: {
@@ -21,36 +21,36 @@ const ProjectSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
-        'Mentor',
-        'Frontend Developer', 
-        'Backend Developer', 
-        'Fullstack Developer', 
-        'Team Lead',
-        'UI/UX Designer', 
-        'Project Manager', 
-        'DevOps Engineer', 
-        'Quality Assurance Engineer'
+        "Mentor",
+        "Frontend Developer", 
+        "Backend Developer", 
+        "Fullstack Developer", 
+        "Team Lead",
+        "UI/UX Designer", 
+        "Project Manager", 
+        "DevOps Engineer", 
+        "Quality Assurance Engineer"
       ]
   }],
   likes: {
     type: Number,
     default: 0
   },
-  // applicants: [{
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'User' 
-  // }],
-  // participants: [{
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'User' 
-  // }],
-  // createdBy: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'User',
-  //   required: [true, 'Please provide a user'],
-  // },
+  applicants: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User" 
+  }],
+  participants: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User" 
+  }],
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "Please provide a user"],
+  },
 }, { timestamps: true }); 
 
-const ProjectModel = mongoose.model('Project', ProjectSchema, 'Projects');
+const ProjectModel = mongoose.model("Project", ProjectSchema, "Projects");
 
 module.exports = ProjectModel;
