@@ -7,9 +7,8 @@ const cors = require("cors")
 const favicon = require("express-favicon")
 const logger = require("morgan")
 
-const mainRouter = require("./routes/mainRouter")
 const userRouter = require("./routes/userRouter")
-const welcomeRouter = require("./routes/welcomeRouter")
+const projectsRouter = require("./routes/projectsRouter")
 
 // Connect to MongoDB
 const connectDB = require("./db/db")
@@ -24,8 +23,7 @@ app.use(express.static("public"))
 app.use(favicon(__dirname + "/public/favicon.ico"))
 
 // routes
-app.use("/api/v1", mainRouter)
-app.use("/api/v1", welcomeRouter)
+app.use("/api/v1", projectsRouter)
 app.use("/api/v1", userRouter)
 
 // Start the server
