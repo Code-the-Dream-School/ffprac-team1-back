@@ -15,33 +15,40 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
         "Completed": 2,
         "In Progress": 3
     };
+    
 
-    let searchQuery = {};
+    let matchConditions = [];
     if (search) {
-        const regex = new RegExp(search, 'i'); 
-        // make a search query to find documents where the search term matches
-        // any of the following fields: title, description, technologies, or rolesNeeded
-        searchQuery = {
-            $or: [
-                //use $regex to search in the array for any string that matches 'regex'
-                { title: regex },
-                { description: regex },
-                { "technologies.frontend": { $regex: regex } },
-                { "technologies.backend": { $regex: regex } },
-                { "technologies.design": { $regex: regex } },
-                { "technologies.projectManagement": { $regex: regex } },
-                { "technologies.devOps": { $regex: regex } },
-                { "technologies.qualityAssurance": { $regex: regex } },
-                { "technologies.database": { $regex: regex } },
-                { rolesNeeded: { $regex: regex } }
-            ]
-        };
+        //split the search string into individual words
+        const searchWords = search.split(" ");
+        //construct regex match conditions for each word for partial matches
+        searchWords.forEach(word => {
+            const regexPattern = new RegExp(word, 'i'); //case-insensitive match
+            matchConditions.push({
+                $or: [
+                    { title: { $regex: regexPattern }},
+                    { description: { $regex: regexPattern }},
+                    { "technologies.frontend": { $regex: regexPattern } },
+                    { "technologies.backend": { $regex: regexPattern } },
+                    { "technologies.design": { $regex: regexPattern } },
+                    { "technologies.projectManagement": { $regex: regexPattern } },
+                    { "technologies.devOps": { $regex: regexPattern } },
+                    { "technologies.qualityAssurance": { $regex: regexPattern } },
+                    { "technologies.database": { $regex: regexPattern } },
+                    { rolesNeeded: { $regex: regexPattern } }
+                ]
+            });
+        });
     }
 
+
     // make aggregation pipeline sorting projects
-    const pipeline = [
+    const pipeline = matchConditions.length > 0 ? [
         {
-            $match: searchQuery //filter documents based on search criteria
+            // Use $match with $and to ensure all regex conditions are met
+            $match: {
+                $and: matchConditions
+            }
         },
         {
             //$addFields stage is used to add new fields to the documents
@@ -68,16 +75,39 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
         {
             $limit: limit //limit the number of documents passed to the next stage to preserve correct pagination
         }
-    ];
+    ] : [
+        {
+            $addFields: {
+                //add a sortOrder field to each document based on the sorting logic defined by the $switch operator.
+                sortOrder: {
+                    $switch: {
+                        branches: [
+                            { case: { $eq: ["$status", "Seeking Team Members"] }, then: sortOrder["Seeking Team Members"] },
+                            { case: { $eq: ["$status", "Completed"] }, then: sortOrder["Completed"] },
+                            { case: { $eq: ["$status", "In Progress"] }, then: sortOrder["In Progress"] }
+                        ],
+                        default: 4
+                    }
+                }
+            }
+        },
+        {
+            $skip: skip //implement pagination by skipping a certain number of documents to preserve correct pagination
+        },
+        {
+            $limit: limit //limit the number of documents passed to the next stage to preserve correct pagination
+        }
+    ]
 
     //execute the aggregation pipeline
-    const projects = await Project.aggregate(pipeline);
+    let projects = await Project.aggregate(pipeline);
+
     //count total matching documents for pagination
-    const totalProjects = await Project.countDocuments(searchQuery);
+    const totalProjects = await Project.countDocuments(search ? { $and: matchConditions } : {});
     
     //calculate total pages
     const totalPages = Math.ceil(totalProjects / limit);
-
+    console.log(typeof search); //object
     //return paginated, sorted search results
     res.status(StatusCodes.OK).json({
         count: projects.length,
