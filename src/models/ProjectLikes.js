@@ -1,14 +1,14 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const ProjectLikesSchema = new mongoose.Schema({
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project',
+    ref: "Project",
     required: true
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true
   },
   likedAt: {
@@ -17,6 +17,6 @@ const ProjectLikesSchema = new mongoose.Schema({
   }
 });
 
-const ProjectLikesModel = mongoose.model('ProjectLike', ProjectLikesSchema, 'ProjectLikes');
+const ProjectLikesModel = mongoose.model("ProjectLike", ProjectLikesSchema, "ProjectLikes");
 
 module.exports = ProjectLikesModel;
