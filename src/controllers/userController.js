@@ -1,22 +1,37 @@
-const User = require("../models/User.js")
+const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
+require("dotenv").config()
+const User = require("../models/User.js")
+
+// Function to generate JWT token
+const generateToken = (userId) => {
+  const secret = process.env.JWT_SECRET
+  const token = jwt.sign({ userId }, secret, { expiresIn: "1h" })
+  return token
+}
 
 const registerUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body
+    console.log("Request Body:", req.body)
+    const { username, email, password, firstName, lastName } = req.body
 
     // check if user already exists
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] })
+    const existingUser = await User.findOne({
+      $or: [{ username }, { email }]
+    })
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" })
     }
 
     // Create a new user
-    const newUser = new User({ username, email, password })
+    const newUser = new User({ username, email, password, firstName, lastName })
     await newUser.save()
     console.log("User registered:", newUser)
 
-    res.status(201).json({ message: "User registered successfully" })
+    // Generate and send JWT token
+    const token = generateToken(newUser._id)
+
+    res.status(201).json({ message: "User registered successfully", token })
   } catch (error) {
     console.error("Error registering user:", error)
     res.status(500).json({ message: "Internal server error" })
@@ -37,7 +52,9 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid username or password" })
     }
 
-    res.status(200).json({ message: "Login successful" })
+    // Generate and send JWT token
+    const token = generateToken(user._id)
+    res.status(200).json({ message: "Login successful", token })
   } catch (error) {
     console.error("Error logging in:", error)
     res.status(500).json({ message: "Internal server error" })
