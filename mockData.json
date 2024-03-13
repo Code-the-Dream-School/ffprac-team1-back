@@ -19,9 +19,7 @@
       "DevOps Engineer",
       "Team Lead"
     ],
-    "likes": 15,
-    "applicants": [],
-    "participants": ["devYelena", "devAnna"]
+    "likes": 15
   },
   {
     "creatorId": "ObjectId('5f8d4feac2ea0a1d2c3c2e9c')",
@@ -36,9 +34,7 @@
       "database": ["PostgreSQL"]
     },
     "rolesNeeded": [],
-    "likes": 22,
-    "applicants": ["devJane", "devJohn, qaHelga"],
-    "participants": ["leadDevAlex"]
+    "likes": 22
   },
   {
     "creatorId": "ObjectId('5f8d4feac2ea0a1d2c3c2e9d')",
@@ -54,9 +50,7 @@
       "database": ["MongoDB"]
     },
     "rolesNeeded": ["Frontend Developer", "Team Lead", "UI/UX Designer"],
-    "likes": 35,
-    "applicants": ["appDevNina"],
-    "participants": ["appDevRick", "qaGuruNina"]
+    "likes": 35
   },
   {
     "creatorId": "ObjectId('5f8d4feac2ea0a1d2c3c2e9e')",
@@ -65,21 +59,14 @@
     "status": "Completed",
     "technologies": {
       "frontend": ["React", "Redux"],
-      "backend": ["Ruby on Rails"],
+      "backend": ["Node.js", "Express.js"],
       "design": ["Figma"],
       "projectManagement": ["Jira"],
       "devOps": ["AWS"],
       "database": ["PostgreSQL"]
     },
     "rolesNeeded": [],
-    "likes": 48,
-    "applicants": [],
-    "participants": [
-      "frontendWizLisa",
-      "railsDevTom",
-      "opsMasterJay",
-      "desJane"
-    ]
+    "likes": 48
   },
   {
     "creatorId": "ObjectId('5f8d4feac2ea0a1d2c3c2e9f')",
@@ -87,12 +74,12 @@
     "description": "An AI system that provides personalized financial advice.",
     "status": "Seeking Team Members",
     "technologies": {
-      "frontend": ["Vue.js", "Vuetify"],
-      "backend": ["Flask", "Celery"],
+      "frontend": ["Vue.js"],
+      "backend": ["Django", "Ruby on Rails"],
       "design": ["Adobe XD"],
       "projectManagement": ["Jira"],
       "devOps": ["Azure", "Docker"],
-      "qualityAssurance": ["PyTest", "Selenium"],
+      "qualityAssurance": ["Selenium"],
       "database": ["MongoDB"]
     },
     "rolesNeeded": [
@@ -101,8 +88,6 @@
       "Backend Developer",
       "Quality Assurance Engineer"
     ],
-    "likes": 62,
-    "applicants": ["mlNerdEva", "flaskDevOwen"],
-    "participants": ["leadMark", "desPete"]
+    "likes": 62
   }
 ]
