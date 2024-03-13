@@ -40,16 +40,16 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { username, password } = req.body
+    const { email, password } = req.body
 
-    const user = await User.findOne({ username })
+    const user = await User.findOne({ email })
     if (!user) {
-      return res.status(401).json({ message: "Invalid username or password" })
+      return res.status(401).json({ message: "Invalid email or password" })
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid username or password" })
+      return res.status(401).json({ message: "Invalid email or password" })
     }
 
     // Generate and send JWT token
