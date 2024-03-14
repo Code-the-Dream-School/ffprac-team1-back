@@ -17,6 +17,7 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
                 $or: [ //$or condition: if it matches any of the conditions listed within the array
                     { title: { $regex: regexPattern } },
                     { description: { $regex: regexPattern } },
+                    { status: { $regex: regexPattern } },
                     { "technologies.frontend": { $regex: regexPattern } },
                     { "technologies.backend": { $regex: regexPattern } },
                     { "technologies.design": { $regex: regexPattern } },
