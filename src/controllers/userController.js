@@ -13,18 +13,18 @@ const generateToken = (userId) => {
 const registerUser = async (req, res) => {
   try {
     console.log("Request Body:", req.body)
-    const { username, email, password, firstName, lastName } = req.body
+    const { email, password, firstName, lastName } = req.body
 
     // check if user already exists
     const existingUser = await User.findOne({
-      $or: [{ username }, { email }]
+      $or: [{ password }, { email }]
     })
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" })
     }
 
     // Create a new user
-    const newUser = new User({ username, email, password, firstName, lastName })
+    const newUser = new User({ email, password, firstName, lastName })
     await newUser.save()
     console.log("User registered:", newUser)
 
