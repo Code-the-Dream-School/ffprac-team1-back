@@ -11,20 +11,23 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
 
     if (search) {
         const searchWords = search.split(" ");
-        const regexQueries = searchWords.map(word => ({
-            $or: [ //$or condition: if it matches any of the conditions listed within the array
-                { title: { $regex: word, $options: 'i' } }, //case-insensitive search
-                { description: { $regex: word, $options: 'i' } },
-                { "technologies.frontend":{ $regex: word, $options: 'i' } }, 
-                { "technologies.backend": { $regex: word, $options: 'i' } }, 
-                { "technologies.design":{ $regex: word, $options: 'i' } }, 
-                { "technologies.projectManagement":{ $regex: word, $options: 'i' } }, 
-                { "technologies.devOps": { $regex: word, $options: 'i' } }, 
-                { "technologies.qualityAssurance": { $regex: word, $options: 'i' } }, 
-                { "technologies.database":{ $regex: word, $options: 'i' } }, 
-                { rolesNeeded:{ $regex: word, $options: 'i' } }, 
-            ]
-        }));
+        const regexQueries = searchWords.map(word => {
+            const regexPattern = new RegExp(word, 'i');
+                    return {
+                $or: [ //$or condition: if it matches any of the conditions listed within the array
+                    { title: { $regex: regexPattern } },
+                    { description: { $regex: regexPattern } },
+                    { "technologies.frontend": { $regex: regexPattern } },
+                    { "technologies.backend": { $regex: regexPattern } },
+                    { "technologies.design": { $regex: regexPattern } },
+                    { "technologies.projectManagement": { $regex: regexPattern } },
+                    { "technologies.devOps": { $regex: regexPattern } },
+                    { "technologies.qualityAssurance": { $regex: regexPattern } },
+                    { "technologies.database": { $regex: regexPattern } },
+                    { rolesNeeded: { $regex: regexPattern } },
+                ]
+            };
+        });
 
         //perform the query with prioritization
         try {
