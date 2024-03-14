@@ -26,10 +26,4 @@ app.use(favicon(__dirname + "/public/favicon.ico"))
 app.use("/api/v1", projectsRouter)
 app.use("/api/v1", userRouter)
 
-// Start the server
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
-})
-
 module.exports = app
