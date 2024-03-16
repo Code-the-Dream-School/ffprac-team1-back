@@ -81,15 +81,17 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
                 //enhance anyMatches with missing words information
                 const enhancedAnyMatches = anyMatches.map(project => {
                     const searchableText = buildSearchableTextFromProject(project);
-                
                     const missingWords = findMissingWords(searchableText, searchWords);
                 
-                    return {
-                        //convert to a plain object to add a custom property which is outside the scope of database operations
-                        ...project.toObject(), 
-                        missingWords 
-                    };
+                //convert to a plain object to add custom properties
+                const projectObj = project.toObject(); 
+                projectObj.missingWords = missingWords;
+                projectObj.missingCount = missingWords.length; // Add the number of missing words for sorting
+
+                return projectObj;
                 });
+                //sort enhancedAnyMatches based on the number of missing words, ascending
+                enhancedAnyMatches.sort((a, b) => a.missingCount - b.missingCount);
                 
                 results = [...allMatches, ...enhancedAnyMatches];
             }
