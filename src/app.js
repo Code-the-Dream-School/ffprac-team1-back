@@ -1,11 +1,14 @@
 require("dotenv").config()
-
 const express = require("express")
 const mongoose = require("mongoose")
 const app = express()
 const cors = require("cors")
 const favicon = require("express-favicon")
 const logger = require("morgan")
+
+const authenticationMiddleware = require('./middleware/authentication');
+const errorHandlerMiddleware = require('./middleware/errorHandler');
+const notFoundMiddleware = require('./middleware/notFound');
 
 const userRouter = require("./routes/userRouter")
 const projectsRouter = require("./routes/projectsRouter")
@@ -24,6 +27,9 @@ app.use(favicon(__dirname + "/public/favicon.ico"))
 
 // routes
 app.use("/api/v1", projectsRouter)
-app.use("/api/v1", userRouter)
+app.use("/api/v1/users", userRouter)
+
+app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
 
 module.exports = app
