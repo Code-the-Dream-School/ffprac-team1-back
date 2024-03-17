@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 require("dotenv").config()
+const { StatusCodes } = require('http-status-codes');
+const { BadRequestError, UnauthenticatedError } = require('../errors');
 const User = require("../models/User.js")
 
 // Function to generate JWT token
@@ -17,10 +19,10 @@ const registerUser = async (req, res) => {
 
     // check if user already exists
     const existingUser = await User.findOne({
-      $or: [{ password }, { email }]
-    })
+      $or: [{ email }]  // Updated to check only for email as unique identifier
+    });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" })
+      throw new BadRequestError('User already exists.');
     }
 
     // Create a new user
@@ -31,10 +33,12 @@ const registerUser = async (req, res) => {
     // Generate and send JWT token
     const token = generateToken(newUser._id)
 
-    res.status(201).json({ message: "User registered successfully", token })
+    res.status(StatusCodes.OK).json({ message: "User registered successfully", token })
   } catch (error) {
-    console.error("Error registering user:", error)
-    res.status(500).json({ message: "Internal server error" })
+    console.error("Error registering user:", error);
+    const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+    const errorMessage = error.message || 'Error registering user';
+    res.status(statusCode).json({ error: errorMessage });
   }
 }
 
@@ -42,32 +46,44 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body
 
+    if (!email || !password) {
+      throw new BadRequestError('Please provide email and password');
+    }
+
     const user = await User.findOne({ email })
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" })
+      throw new UnauthenticatedError('Invalid email');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid email or password" })
+      throw new UnauthenticatedError('Invalid password');
     }
 
     // Generate and send JWT token
     const token = generateToken(user._id)
-    res.status(200).json({ message: "Login successful", token })
+    res.status(StatusCodes.OK).json({ message: "Logged in successful", token });
   } catch (error) {
     console.error("Error logging in:", error)
-    res.status(500).json({ message: "Internal server error" })
+    const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+    const errorMessage = error.message || 'Error logging in';
+    res.status(statusCode).json({ error: errorMessage });
   }
 }
 
 const logoutUser = (req, res) => {
-  // Clear the 'token' cookie
-  res.clearCookie("token", {
-    httpOnly: true,
-    expires: new Date(Date.now())
-  })
-  res.status(200).json({ message: "Logout successful" })
+  try {
+
+    // Clear the 'token' cookie or session
+    res.clearCookie("token", {
+      httpOnly: true,
+      expires: new Date(Date.now())
+    })
+    res.status(StatusCodes.OK).json({ message: 'Logged out successfully' });
+  } catch (err) {
+    console.error("Error during logout:", err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Logout failed' });
+  }
 }
 
 module.exports = { registerUser, loginUser, logoutUser }
