@@ -6,7 +6,6 @@ const cors = require("cors")
 const favicon = require("express-favicon")
 const logger = require("morgan")
 
-const authenticationMiddleware = require('./middleware/authentication');
 const errorHandlerMiddleware = require('./middleware/errorHandler');
 const notFoundMiddleware = require('./middleware/notFound');
 
