@@ -125,5 +125,37 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
     }
 });
 
-module.exports =  { displaySearchProjects };
+const getProjectDetails = asyncWrapper(async (req, res, next) => {
+    const { projectId } = req.params;
+    console.log(projectId)
+    //const createdBy = req.user.userId;
+    //const project = await Project.findOne({ _id: projectId, createdBy });
+    const project = await Project.findOne({ _id: projectId });
+
+    if (!project) {
+        throw new NotFoundError('The project does not exist');
+    }
+
+    res.status(StatusCodes.OK).json({ project });
+})
+
+const createProject = asyncWrapper(async (req, res, next) => {
+
+})
+
+const editProject = asyncWrapper(async (req, res, next) => {
+
+})
+
+const deleteProject = asyncWrapper(async (req, res, next) => {
+
+})
+
+module.exports =  { 
+    displaySearchProjects,
+    getProjectDetails,
+    createProject,
+    editProject,
+    deleteProject
+};
 
