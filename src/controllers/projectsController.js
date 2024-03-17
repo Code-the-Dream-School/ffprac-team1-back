@@ -10,7 +10,7 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
     const skip = (page - 1) * limit;
 
     if (search) {
-        const searchWords = search.split(" ");
+        const searchWords = search.split(/[\s,;+]+/);
         const regexQueries = searchWords.map(word => {
             const regexPattern = new RegExp(word, 'i');
                     return {
