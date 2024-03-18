@@ -25,7 +25,7 @@ app.use(express.static("public"))
 app.use(favicon(__dirname + "/public/favicon.ico"))
 
 // routes
-app.use("/api/v1", projectsRouter)
+app.use("/api/v1/projects", projectsRouter)
 app.use("/api/v1/users", userRouter)
 
 app.use(notFoundMiddleware);

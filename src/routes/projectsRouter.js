@@ -13,23 +13,23 @@ const authenticationMiddleware = require("../middleware/authentication");
 const optionalAuthenticationMiddleware = require("../middleware/optionalAuthentication");
 
 // GET /api/v1/projects
-router.route("/projects")
+router.route("/")
     .get(optionalAuthenticationMiddleware, displaySearchProjects);
 
 // POST /api/v1/projects
-router.route("/projects")
+router.route("/")
     .post(authenticationMiddleware, projectCreationRules(), validate, createProject);
 
 // GET /api/v1/projects/:projectId
-router.route("/projects/:projectId")
+router.route("/:projectId")
     .get(optionalAuthenticationMiddleware, getProjectDetails);
 
 // PUT /api/v1/projects/:projectId
-router.route("/projects/:projectId")
+router.route("/:projectId")
     .put(authenticationMiddleware, editProject);
 
 // DELETE /api/v1/projects/:projectId
-router.route("/projects/:projectId")
+router.route("/:projectId")
     .delete(authenticationMiddleware, deleteProject);
 
 module.exports = router;
