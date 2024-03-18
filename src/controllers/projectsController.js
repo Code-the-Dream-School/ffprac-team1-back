@@ -177,7 +177,39 @@ const createProject = asyncWrapper(async (req, res, next) => {
 });
     
 const editProject = asyncWrapper(async (req, res, next) => {
+    const { projectId } = req.params; 
+    const userId = req.user.userId; 
 
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    if (project.createdBy.toString() !== userId) {
+        return res.status(StatusCodes.FORBIDDEN).json({ message: "You do not have permission to edit this project." });
+    }
+
+    const updateData = {};
+    if (req.body.technologies) {
+        for (const [key, value] of Object.entries(req.body.technologies)) {
+            updateData[`technologies.${key}`] = value;
+        }
+    }
+
+    Object.entries(req.body).forEach(([key, value]) => {
+        if (key !== 'technologies') {
+            updateData[key] = value;
+        }
+    });
+
+    const updatedProject = await Project.findByIdAndUpdate(
+        projectId,
+        { $set: updateData }, 
+        { new: true, runValidators: true } 
+    );
+
+    res.status(StatusCodes.OK).json({ project: updatedProject });
 })
 
 const deleteProject = asyncWrapper(async (req, res, next) => {
@@ -191,12 +223,12 @@ const deleteProject = asyncWrapper(async (req, res, next) => {
     }
 
     if (project.createdBy.toString() !== userId) {
-        return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Unauthorized to delete this project' });
+        return res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have permission to delete this project' });
     }
 
-    await Project.findByIdAndDelete(projectId);
+    const updatedProject = await Project.findByIdAndUpdate(projectId, req.body, { new: true, runValidators: true });
 
-    res.status(StatusCodes.OK).json({ message: 'Project deleted successfully' });
+    res.status(StatusCodes.OK).json({ project: updatedProject });
 });
 
 module.exports =  { 
