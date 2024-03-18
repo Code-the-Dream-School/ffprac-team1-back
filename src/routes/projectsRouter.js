@@ -12,14 +12,16 @@ const {
 const authenticationMiddleware = require("../middleware/authentication");
 
 // GET /api/v1/projects
-router.route("/projects").get(displaySearchProjects);
+router.route("/projects")
+    .get(authenticationMiddleware, displaySearchProjects);
 
 // POST /api/v1/projects
 router.route("/projects")
     .post(authenticationMiddleware, projectCreationRules(), validate, createProject);
 
 // GET /api/v1/projects/:projectId
-router.route("/projects/:projectId").get(getProjectDetails);
+router.route("/projects/:projectId")
+    .get(authenticationMiddleware, getProjectDetails);
 
 // PUT /api/v1/projects/:projectId
 router.route("/projects/:projectId")

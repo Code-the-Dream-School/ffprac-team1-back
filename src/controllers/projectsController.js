@@ -127,16 +127,25 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
 
 const getProjectDetails = asyncWrapper(async (req, res, next) => {
     const { projectId } = req.params;
-    console.log(projectId)
-    //const createdBy = req.user.userId;
-    //const project = await Project.findOne({ _id: projectId, createdBy });
+
     const project = await Project.findOne({ _id: projectId });
 
     if (!project) {
         throw new NotFoundError('The project does not exist');
     }
 
-    res.status(StatusCodes.OK).json({ project });
+    let response = {
+        title: project.title,
+        description: project.description,
+        status: project.status,
+        likes: project.likes,
+        technologies: project.technologies,
+        rolesNeeded: project.rolesNeeded,
+        participants: req.user && req.user.userId ? project.participants : undefined,
+    };
+
+    res.status(StatusCodes.OK).json({ project: response });
+
 })
 
 const createProject = asyncWrapper(async (req, res, next) => {
