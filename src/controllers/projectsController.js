@@ -115,12 +115,23 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
         const totalProjects = await Project.countDocuments();
         const totalPages = Math.ceil(totalProjects / limit);
 
+        const data = projects.map(project => {
+            const projectObj = project.toObject();
+            
+            const isCreator = req.user && req.user.userId === project.createdBy.toString();
+            projectObj.applicants = isCreator ? project.applicants : undefined;
+    
+            projectObj.participants = req.user && req.user.userId ? project.participants : undefined;
+    
+            return projectObj;
+        });
+
         res.status(StatusCodes.OK).json({
             count: projects.length,
             totalPages,
             page,
             limit,
-            data: projects,
+            data,
         });
     }
 });
@@ -134,6 +145,8 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
         throw new NotFoundError('The project does not exist');
     }
 
+    const isCreator = req.user && req.user.userId === project.createdBy.toString();
+
     let response = {
         title: project.title,
         description: project.description,
@@ -141,11 +154,11 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
         likes: project.likes,
         technologies: project.technologies,
         rolesNeeded: project.rolesNeeded,
+        applicants: isCreator ? project.applicants : undefined,
         participants: req.user && req.user.userId ? project.participants : undefined,
     };
 
     res.status(StatusCodes.OK).json({ project: response });
-
 })
 
 const createProject = asyncWrapper(async (req, res, next) => {
