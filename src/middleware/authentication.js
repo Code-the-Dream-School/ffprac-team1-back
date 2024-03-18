@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken');
+const { StatusCodes } = require('http-status-codes');
 const { UnauthenticatedError } = require('../errors');
 
 const authenticationMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer')) {
-    throw new UnauthenticatedError('Authentication invalid');
+    return res.status(StatusCodes.UNAUTHORIZED).json({ message: "You must be logged in to perform this action." });
   }
   const token = authHeader.split(' ')[1];
   try {
