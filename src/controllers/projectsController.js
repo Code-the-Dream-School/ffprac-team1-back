@@ -181,8 +181,23 @@ const editProject = asyncWrapper(async (req, res, next) => {
 })
 
 const deleteProject = asyncWrapper(async (req, res, next) => {
+    const { projectId } = req.params; 
+    const userId = req.user.userId; 
 
-})
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    if (project.createdBy.toString() !== userId) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Unauthorized to delete this project' });
+    }
+
+    await Project.findByIdAndDelete(projectId);
+
+    res.status(StatusCodes.OK).json({ message: 'Project deleted successfully' });
+});
 
 module.exports =  { 
     displaySearchProjects,

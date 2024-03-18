@@ -10,10 +10,11 @@ const {
     deleteProject
 } = require("../controllers/projectsController");
 const authenticationMiddleware = require("../middleware/authentication");
+const optionalAuthenticationMiddleware = require("../middleware/optionalAuthentication");
 
 // GET /api/v1/projects
 router.route("/projects")
-    .get(authenticationMiddleware, displaySearchProjects);
+    .get(optionalAuthenticationMiddleware, displaySearchProjects);
 
 // POST /api/v1/projects
 router.route("/projects")
@@ -21,7 +22,7 @@ router.route("/projects")
 
 // GET /api/v1/projects/:projectId
 router.route("/projects/:projectId")
-    .get(authenticationMiddleware, getProjectDetails);
+    .get(optionalAuthenticationMiddleware, getProjectDetails);
 
 // PUT /api/v1/projects/:projectId
 router.route("/projects/:projectId")
