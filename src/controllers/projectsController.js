@@ -140,9 +140,20 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
 })
 
 const createProject = asyncWrapper(async (req, res, next) => {
+    const { userId: createdBy } = req.user;
+    const projectData = {
+        ...req.body,
+        createdBy 
+    };
 
-})
-
+    delete projectData.likes;
+    delete projectData.applicants;
+    delete projectData.participants;
+    
+    const project = await Project.create(projectData); 
+    res.status(StatusCodes.CREATED).json({ project }); 
+});
+    
 const editProject = asyncWrapper(async (req, res, next) => {
 
 })
