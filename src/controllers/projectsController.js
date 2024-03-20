@@ -10,7 +10,7 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
     const skip = (page - 1) * limit;
 
     if (search) {
-        const searchWords = search.split(" ");
+        const searchWords = search.split(/[\s,;+]+/);
         const regexQueries = searchWords.map(word => {
             const regexPattern = new RegExp(word, 'i');
                     return {
@@ -81,15 +81,17 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
                 //enhance anyMatches with missing words information
                 const enhancedAnyMatches = anyMatches.map(project => {
                     const searchableText = buildSearchableTextFromProject(project);
-                
                     const missingWords = findMissingWords(searchableText, searchWords);
                 
-                    return {
-                        //convert to a plain object to add a custom property which is outside the scope of database operations
-                        ...project.toObject(), 
-                        missingWords 
-                    };
+                //convert to a plain object to add custom properties
+                const projectObj = project.toObject(); 
+                projectObj.missingWords = missingWords;
+                projectObj.missingCount = missingWords.length; // Add the number of missing words for sorting
+
+                return projectObj;
                 });
+                //sort enhancedAnyMatches based on the number of missing words, ascending
+                enhancedAnyMatches.sort((a, b) => a.missingCount - b.missingCount);
                 
                 results = [...allMatches, ...enhancedAnyMatches];
             }
@@ -113,15 +115,127 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
         const totalProjects = await Project.countDocuments();
         const totalPages = Math.ceil(totalProjects / limit);
 
+        const data = projects.map(project => {
+            const projectObj = project.toObject();
+            
+            const isCreator = req.user && req.user.userId === project.createdBy.toString();
+            projectObj.applicants = isCreator ? project.applicants : undefined;
+    
+            projectObj.participants = req.user && req.user.userId ? project.participants : undefined;
+    
+            return projectObj;
+        });
+
         res.status(StatusCodes.OK).json({
             count: projects.length,
             totalPages,
             page,
             limit,
-            data: projects,
+            data,
         });
     }
 });
 
-module.exports =  { displaySearchProjects };
+const getProjectDetails = asyncWrapper(async (req, res, next) => {
+    const { projectId } = req.params;
+
+    const project = await Project.findOne({ _id: projectId });
+
+    if (!project) {
+        throw new NotFoundError('The project does not exist');
+    }
+
+    const isCreator = req.user && req.user.userId === project.createdBy.toString();
+
+    let response = {
+        title: project.title,
+        description: project.description,
+        status: project.status,
+        likes: project.likes,
+        technologies: project.technologies,
+        rolesNeeded: project.rolesNeeded,
+        applicants: isCreator ? project.applicants : undefined,
+        participants: req.user && req.user.userId ? project.participants : undefined,
+    };
+
+    res.status(StatusCodes.OK).json({ project: response });
+})
+
+const createProject = asyncWrapper(async (req, res, next) => {
+    const { userId: createdBy } = req.user;
+    const projectData = {
+        ...req.body,
+        createdBy 
+    };
+
+    delete projectData.likes;
+    delete projectData.applicants;
+    delete projectData.participants;
+    
+    const project = await Project.create(projectData); 
+    res.status(StatusCodes.CREATED).json({ project }); 
+});
+    
+const editProject = asyncWrapper(async (req, res, next) => {
+    const { projectId } = req.params; 
+    const userId = req.user.userId; 
+
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    if (project.createdBy.toString() !== userId) {
+        return res.status(StatusCodes.FORBIDDEN).json({ message: "You do not have permission to edit this project." });
+    }
+
+    const updateData = {};
+    if (req.body.technologies) {
+        for (const [key, value] of Object.entries(req.body.technologies)) {
+            updateData[`technologies.${key}`] = value;
+        }
+    }
+
+    Object.entries(req.body).forEach(([key, value]) => {
+        if (key !== 'technologies') {
+            updateData[key] = value;
+        }
+    });
+
+    const updatedProject = await Project.findByIdAndUpdate(
+        projectId,
+        { $set: updateData }, 
+        { new: true, runValidators: true } 
+    );
+
+    res.status(StatusCodes.OK).json({ project: updatedProject });
+})
+
+const deleteProject = asyncWrapper(async (req, res, next) => {
+    const { projectId } = req.params; 
+    const userId = req.user.userId; 
+
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    if (project.createdBy.toString() !== userId) {
+        return res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have permission to delete this project' });
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(projectId, req.body, { new: true, runValidators: true });
+
+    res.status(StatusCodes.OK).json({ project: updatedProject });
+});
+
+module.exports =  { 
+    displaySearchProjects,
+    getProjectDetails,
+    createProject,
+    editProject,
+    deleteProject
+};
 
