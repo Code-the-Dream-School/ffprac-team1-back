@@ -1,5 +1,6 @@
 const Project = require("../models/Project");
 const asyncWrapper = require("../middleware/async-wrapper");
+const { NotFoundError } = require ("../errors");
 const { StatusCodes } = require("http-status-codes");
 
 const displaySearchProjects = asyncWrapper(async (req, res) => {
@@ -223,13 +224,14 @@ const deleteProject = asyncWrapper(async (req, res, next) => {
     }
 
     if (project.createdBy.toString() !== userId) {
-        return res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have permission to delete this project' });
+        return res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have permission to delete this project.' });
     }
 
-    const updatedProject = await Project.findByIdAndUpdate(projectId, req.body, { new: true, runValidators: true });
+    await Project.findByIdAndDelete(projectId); 
 
-    res.status(StatusCodes.OK).json({ project: updatedProject });
+    res.status(StatusCodes.OK).json({ message: 'Project successfully deleted' });
 });
+
 
 module.exports =  { 
     displaySearchProjects,
@@ -238,4 +240,3 @@ module.exports =  {
     editProject,
     deleteProject
 };
-
