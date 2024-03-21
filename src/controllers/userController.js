@@ -7,8 +7,9 @@ const User = require("../models/User.js")
 
 // Function to generate JWT token
 const generateToken = (userId) => {
-  const secret = process.env.JWT_SECRET
-  const token = jwt.sign({ userId }, secret, { expiresIn: "1h" })
+  const secret = process.env.JWT_SECRET;
+  const jwtLifetime = process.env.JWT_LIFETIME;
+  const token = jwt.sign({ userId }, secret, { expiresIn: jwtLifetime })
   return token
 }
 
@@ -62,7 +63,15 @@ const loginUser = async (req, res) => {
 
     // Generate and send JWT token
     const token = generateToken(user._id)
-    res.status(StatusCodes.OK).json({ message: "Logged in successful", token });
+    res.status(StatusCodes.OK).json({ 
+      message: "Logged in successful", 
+      token,
+      user: {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
+      },
+    });
   } catch (error) {
     console.error("Error logging in:", error)
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;

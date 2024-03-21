@@ -6,7 +6,6 @@ const cors = require("cors")
 const favicon = require("express-favicon")
 const logger = require("morgan")
 
-const authenticationMiddleware = require('./middleware/authentication');
 const errorHandlerMiddleware = require('./middleware/errorHandler');
 const notFoundMiddleware = require('./middleware/notFound');
 
@@ -26,7 +25,7 @@ app.use(express.static("public"))
 app.use(favicon(__dirname + "/public/favicon.ico"))
 
 // routes
-app.use("/api/v1", projectsRouter)
+app.use("/api/v1/projects", projectsRouter)
 app.use("/api/v1/users", userRouter)
 
 app.use(notFoundMiddleware);
