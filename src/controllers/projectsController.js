@@ -1,4 +1,5 @@
 const Project = require("../models/Project");
+const ProjectLikes = require('../models/ProjectLikes'); 
 const asyncWrapper = require("../middleware/async-wrapper");
 const { NotFoundError } = require ("../errors");
 const { StatusCodes } = require("http-status-codes");
@@ -232,11 +233,41 @@ const deleteProject = asyncWrapper(async (req, res, next) => {
     res.status(StatusCodes.OK).json({ message: 'Project successfully deleted' });
 });
 
+const toggleLike = async (req, res) => {
+    const { projectId } = req.params; 
+    const userId = req.user.userId; 
 
+    try {
+        const project = await Project.findById(projectId);
+        if (!project) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
+        }
+    
+        const existingLike = await ProjectLikes.findOne({ projectId, userId });
+    
+        if (existingLike) {
+            await ProjectLikes.findByIdAndDelete(existingLike._id);
+            project.likeCount = Math.max(0, project.likeCount - 1);
+        } else {
+            await new ProjectLikes({ projectId, userId }).save();
+            project.likeCount += 1; 
+        }
+    
+        await project.save(); 
+    
+        return res.status(StatusCodes.OK).json({
+            liked: !existingLike,
+            totalLikes: project.likeCount 
+        });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'An error occurred' });
+    }
+};
 module.exports =  { 
     displaySearchProjects,
     getProjectDetails,
     createProject,
     editProject,
-    deleteProject
+    deleteProject,
+    toggleLike
 };
