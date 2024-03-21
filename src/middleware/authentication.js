@@ -5,7 +5,9 @@ const { UnauthenticatedError } = require('../errors');
 const authenticationMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer')) {
-    return res.status(StatusCodes.UNAUTHORIZED).json({ message: "You must be logged in to perform this action." });
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ message: 'You must be logged in to perform this action.' });
   }
   const token = authHeader.split(' ')[1];
   try {

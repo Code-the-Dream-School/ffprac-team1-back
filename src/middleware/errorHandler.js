@@ -25,11 +25,14 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     customError.statusCode = 404;
   }
   if (err.name === 'TokenExpiredError') {
-    customError.message = err.userMessage || 'Session expired, please login again';
+    customError.message =
+      err.userMessage || 'Session expired, please login again';
     customError.statusCode = 401;
   }
 
-  return res.status(customError.statusCode).json({ message: customError.message });
+  return res
+    .status(customError.statusCode)
+    .json({ message: customError.message });
 };
 
 module.exports = errorHandlerMiddleware;
