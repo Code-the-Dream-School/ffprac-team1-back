@@ -32,10 +32,10 @@ const ProjectSchema = new mongoose.Schema({
         "Quality Assurance Engineer"
       ]
   }],
-  likes: {
-    type: Number,
-    default: 0
-  },
+  likeCount: { 
+    type: Number, 
+    default: 0 
+  }, 
   applicants: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User" 
