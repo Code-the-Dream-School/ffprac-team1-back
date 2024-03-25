@@ -121,7 +121,7 @@ const requestPasswordReset = async (req, res) => {
     await user.save()
     res
       .status(StatusCodes.OK)
-      .json({ response: "Password reset process initiated successfully" })
+      .json({ response: "Your password has been reset successfully" })
   } catch (error) {
     console.error("Error requesting password reset:", error)
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR
