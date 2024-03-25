@@ -110,7 +110,10 @@ const requestPasswordReset = async (req, res) => {
 
     // generate password reset token and expiration time
     const resetToken = generateToken(user._id)
-    const resetTokenExpiry = new Date(Date.now() + 3600000) // token expires in 1 hour
+    const resetTokenExpiry = new Date(
+      Date.now() +
+        parseInt(process.env.JWT_RESET_PASSWORD_EXPIRES_IN) * 60 * 60 * 1000 // Convert hours to milliseconds
+    )
 
     // update user's password reset token and expiration time
     user.passwordResetToken = resetToken
