@@ -38,6 +38,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: null
     },
+    passwordResetTokenExpiry: {
+      type: Date,
+      default: null
+    },
     watchList: [
       {
         type: mongoose.Schema.Types.ObjectId,
