@@ -2,6 +2,7 @@ const Project = require('../models/Project');
 const asyncWrapper = require('../middleware/async-wrapper');
 const { NotFoundError } = require('../errors');
 const { StatusCodes } = require('http-status-codes');
+const ProjectLikes = require('../models/ProjectLikes');
 
 const displaySearchProjects = asyncWrapper(async (req, res) => {
   let { page, limit, search } = req.query;
