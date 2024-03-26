@@ -11,6 +11,7 @@ const notFoundMiddleware = require('./middleware/notFound');
 
 const userRouter = require("./routes/userRouter")
 const projectsRouter = require("./routes/projectsRouter")
+const profilesRouter = require("./routes/profilesRouter")
 
 // Connect to MongoDB
 const connectDB = require("./db/db")
@@ -27,6 +28,7 @@ app.use(favicon(__dirname + "/public/favicon.ico"))
 // routes
 app.use("/api/v1/projects", projectsRouter)
 app.use("/api/v1/users", userRouter)
+app.use("/api/v1/profiles", profilesRouter)
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
