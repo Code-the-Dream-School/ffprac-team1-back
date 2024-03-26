@@ -25,7 +25,7 @@ router.route("/")
 router.route("/:projectId")
     .get(optionalAuthenticationMiddleware, getProjectDetails);
 
-// PUT /api/v1/projects/:projectId
+// PATCH /api/v1/projects/:projectId
 router.route("/:projectId")
     .patch(authenticationMiddleware, editProject);
 
