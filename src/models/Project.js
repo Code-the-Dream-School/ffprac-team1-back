@@ -1,14 +1,25 @@
 const mongoose = require("mongoose");
 const TechnologiesSchema = require("./Technologies"); 
 
+const urlValidationPattern = /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})$/;
+
+const validateURL = (url) => {
+    if (url === null) {
+      return true; 
+    }
+    return urlValidationPattern.test(url);
+  };
+
 const ProjectSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true
+    required: true,
+    maxlength: [100, 'The project title cannot exceed 100 characters'],
   },
   description: {
     type: String,
-    required: true
+    required: true,
+    maxlength: [700, 'The project description cannot exceed 700 characters'],
   },
   status: {
     type: String,
@@ -44,6 +55,14 @@ const ProjectSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User" 
   }],
+  projectPictureUrl: {
+    type: String,
+    validate: [validateURL, 'Please provide a valid URL.'], 
+  },
+  projectCoverPictureUrl: {
+    type: String,
+    validate: [validateURL, 'Please provide a valid URL.'], 
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
