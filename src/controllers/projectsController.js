@@ -156,8 +156,9 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
         likes: project.likes,
         technologies: project.technologies,
         rolesNeeded: project.rolesNeeded,
-        applicants: isCreator ? project.applicants : undefined,
+        createdBy: req.user && req.user.userId ? project.createdBy : undefined,
         participants: req.user && req.user.userId ? project.participants : undefined,
+        applicants: isCreator ? project.applicants : undefined,
     };
 
     res.status(StatusCodes.OK).json({ project: response });
