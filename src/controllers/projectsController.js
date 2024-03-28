@@ -170,17 +170,6 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
     likes: project.likes,
     technologies: project.technologies,
     rolesNeeded: project.rolesNeeded,
-    applicants: isCreator ? project.applicants : undefined,
-    participants:
-      req.user && req.user.userId ? project.participants : undefined,
-  };
-  let response = {
-    title: project.title,
-    description: project.description,
-    status: project.status,
-    likes: project.likes,
-    technologies: project.technologies,
-    rolesNeeded: project.rolesNeeded,
     createdBy: req.user && req.user.userId ? project.createdBy : undefined,
     participants:
       req.user && req.user.userId ? project.participants : undefined,
