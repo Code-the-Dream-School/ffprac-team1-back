@@ -67,9 +67,8 @@ const ProjectSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: [true, "Please provide a user"],
-  },
-  { timestamps: true }
-);
+  }
+},{ timestamps: true });
 
 const ProjectModel = mongoose.model('Project', ProjectSchema, 'Projects');
 

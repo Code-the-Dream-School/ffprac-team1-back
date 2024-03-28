@@ -70,9 +70,7 @@ const UserSchema = new mongoose.Schema(
         ref: 'Project',
       },
     ],
-        ref: "Project"
-      }
-    ],
+  
     searchingStatus: {
       type: String,
       enum: ['project', 'people'],
