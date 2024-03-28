@@ -9,8 +9,8 @@ const optionalAuthenticationMiddleware = async (req, res, next) => {
   const token = authHeader.split(' ')[1];
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const { userId, email } = payload;
-    req.user = { userId, email };
+    const { userId } = payload;
+    req.user = { userId };
     next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {

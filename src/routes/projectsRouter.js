@@ -42,6 +42,8 @@ router
 
 // PUT /api/v1/projects/:projectId
 router.route('/:projectId').put(authenticationMiddleware, editProject);
+// PATCH /api/v1/projects/:projectId
+router.route('/:projectId').patch(authenticationMiddleware, editProject);
 
 // DELETE /api/v1/projects/:projectId
 router.route('/:projectId').delete(authenticationMiddleware, deleteProject);
