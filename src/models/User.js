@@ -1,6 +1,16 @@
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 
+const urlValidationPattern =
+  /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})$/
+
+const validateURL = (url) => {
+  if (url === null) {
+    return true
+  }
+  return urlValidationPattern.test(url)
+}
+
 const UserSchema = new mongoose.Schema(
   {
     firstName: {
@@ -42,7 +52,60 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       default: null
     },
+    userPictureUrl: {
+      type: String,
+      validate: [validateURL, "Please provide a valid URL."]
+    },
+    profileCoverPictureUrl: {
+      type: String,
+      validate: [validateURL, "Please provide a valid URL."]
+    },
     watchList: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Project"
+      }
+    ],
+    searchingStatus: {
+      type: String,
+      enum: ["project", "people"]
+    },
+    title: {
+      type: String,
+      maxlength: [100, "The title cannot exceed 100 characters"]
+    },
+    about: {
+      type: String,
+      maxlength: [500, "This section cannot exceed 500 characters"]
+    },
+    offer: {
+      type: String,
+      maxlength: [500, "This section cannot exceed 500 characters"]
+    },
+    contacts: {
+      linkedIn: {
+        type: String,
+        default: null,
+        validate: [validateURL, "Please provide a valid URL."]
+      },
+      github: {
+        type: String,
+        default: null,
+        validate: [validateURL, "Please provide a valid URL."]
+      },
+      portfolioWebsite: {
+        type: String,
+        default: null,
+        validate: [validateURL, "Please provide a valid URL."]
+      }
+    },
+    ownProjects: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Project"
+      }
+    ],
+    participatingProjects: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Project"
