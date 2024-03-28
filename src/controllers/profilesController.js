@@ -53,11 +53,9 @@ const updateUserProfile = async (req, res) => {
 
     res.status(StatusCodes.OK).json(updatedUser);
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({
-        message: 'We could not update your profile. Try again later please.',
-      });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: 'We could not update your profile. Try again later please.',
+    });
   }
 };
 
