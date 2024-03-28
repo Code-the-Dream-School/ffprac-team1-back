@@ -11,16 +11,6 @@ const {
 } = require('../controllers/projectsController');
 const authenticationMiddleware = require('../middleware/authentication');
 const optionalAuthenticationMiddleware = require('../middleware/optionalAuthentication');
-const {
-  displaySearchProjects,
-  getProjectDetails,
-  createProject,
-  editProject,
-  deleteProject,
-  toggleLike,
-} = require('../controllers/projectsController');
-const authenticationMiddleware = require('../middleware/authentication');
-const optionalAuthenticationMiddleware = require('../middleware/optionalAuthentication');
 
 // GET /api/v1/projects
 router.route('/').get(optionalAuthenticationMiddleware, displaySearchProjects);
@@ -48,8 +38,6 @@ router.route('/:projectId').patch(authenticationMiddleware, editProject);
 // DELETE /api/v1/projects/:projectId
 router.route('/:projectId').delete(authenticationMiddleware, deleteProject);
 
-// PUT /api/v1/projects/:projectId/like'
-router.route('/:projectId/like').put(authenticationMiddleware, toggleLike);
 
 // PUT /api/v1/projects/:projectId/like'
 router.route('/:projectId/like').put(authenticationMiddleware, toggleLike);
