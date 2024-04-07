@@ -1,4 +1,3 @@
-const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 require("dotenv").config()
 const { StatusCodes } = require("http-status-codes")
@@ -22,14 +21,20 @@ const registerUser = async (req, res) => {
     await newUser.save()
     console.log("User registered:", newUser)
 
-    // Generate token
-    const token = generateToken(newUser._id)
     // Attach cookies to the response
     attachCookiesToResponse({ res, user: newUser })
 
     res
       .status(StatusCodes.OK)
-      .json({ message: "User registered successfully", token })
+      .json({
+        message: "User registered successfully", 
+        user: {
+          email: newUser.email,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          id: newUser._id,
+        }
+      })
   } catch (error) {
     console.error("Error registering user:", error)
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR
@@ -64,7 +69,8 @@ const loginUser = async (req, res) => {
       user: {
         email: user.email,
         firstName: user.firstName,
-        lastName: user.lastName
+        lastName: user.lastName,
+        id: user._id,
       }
     })
   } catch (error) {
