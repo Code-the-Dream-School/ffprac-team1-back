@@ -29,7 +29,15 @@ const registerUser = async (req, res) => {
 
     res
       .status(StatusCodes.OK)
-      .json({ message: "User registered successfully", token })
+      .json({
+        message: "User registered successfully", 
+        user: {
+          email: newUser.email,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          id: newUser._id,
+        }
+      })
   } catch (error) {
     console.error("Error registering user:", error)
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR
