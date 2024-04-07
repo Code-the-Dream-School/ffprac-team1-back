@@ -21,7 +21,10 @@ connectDB()
 // Generate a random secret key for cookies
 const secretKey = crypto.randomBytes(32).toString("hex")
 // middleware
-app.use(cors())
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true
+   })); 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(logger("dev"))
