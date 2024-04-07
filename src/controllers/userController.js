@@ -22,8 +22,6 @@ const registerUser = async (req, res) => {
     await newUser.save()
     console.log("User registered:", newUser)
 
-    // Generate token
-    const token = generateToken(newUser._id)
     // Attach cookies to the response
     attachCookiesToResponse({ res, user: newUser })
 
