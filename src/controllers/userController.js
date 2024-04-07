@@ -4,24 +4,15 @@ require("dotenv").config()
 const { StatusCodes } = require("http-status-codes")
 const { BadRequestError, UnauthenticatedError } = require("../errors")
 const User = require("../models/User.js")
-
-// Function to generate JWT token
-const generateToken = (userId) => {
-  const secret = process.env.JWT_SECRET
-  const jwtLifetime = process.env.JWT_LIFETIME
-  const token = jwt.sign({ userId }, secret, { expiresIn: jwtLifetime })
-  return token
-}
-
+const generateToken = require("../util/generateToken")
+const attachCookiesToResponse = require("../util/attachCookiesToResponse")
 const registerUser = async (req, res) => {
   try {
     console.log("Request Body:", req.body)
     const { email, password, firstName, lastName } = req.body
 
     // check if user already exists
-    const existingUser = await User.findOne({
-      $or: [{ email }] // Updated to check only for email as unique identifier
-    })
+    const existingUser = await User.findOne({ email })
     if (existingUser) {
       throw new BadRequestError("User already exists.")
     }
@@ -31,8 +22,10 @@ const registerUser = async (req, res) => {
     await newUser.save()
     console.log("User registered:", newUser)
 
-    // Generate and send JWT token
+    // Generate token
     const token = generateToken(newUser._id)
+    // Attach cookies to the response
+    attachCookiesToResponse({ res, user: newUser })
 
     res
       .status(StatusCodes.OK)
@@ -63,11 +56,11 @@ const loginUser = async (req, res) => {
       throw new UnauthenticatedError("Invalid password")
     }
 
-    // Generate and send JWT token
-    const token = generateToken(user._id)
+    // Attach cookies to the response
+    attachCookiesToResponse({ res, user })
+
     res.status(StatusCodes.OK).json({
       message: "Logged in successful",
-      token,
       user: {
         email: user.email,
         firstName: user.firstName,
