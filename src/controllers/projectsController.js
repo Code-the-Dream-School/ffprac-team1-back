@@ -248,44 +248,40 @@ const deleteProject = asyncWrapper(async (req, res, next) => {
     res.status(StatusCodes.OK).json({ message: 'Project successfully deleted' });
 });
 
-const toggleLike = async (req, res) => {
+const toggleLike = asyncWrapper(async (req, res, next) => {
     const { projectId } = req.params; 
     const userId = req.user.userId; 
 
-    try {
-        const project = await Project.findById(projectId);
-        if (!project) {
-            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
-        }
-    
-        const existingLike = await ProjectLikes.findOne({ projectId, userId });
-        const user = await User.findById(userId);
+    const project = await Project.findById(projectId);
+    if (!project) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    const existingLike = await ProjectLikes.findOne({ projectId, userId });
+    const user = await User.findById(userId);
 
         if (!user) {
             return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
         }
     
-        if (existingLike) {
-            await ProjectLikes.findByIdAndDelete(existingLike._id);
-            project.likeCount = Math.max(0, project.likeCount - 1);
-            user.watchList.pull(projectId); // .pull() removes an item from the Mongoose array
-        } else {
-            await new ProjectLikes({ projectId, userId }).save();
-            project.likeCount += 1; 
-            user.watchList.push(projectId); // .push() adds an item to the array
-        }
-    
-        await project.save(); 
-        await user.save(); 
-        
-        return res.status(StatusCodes.OK).json({
-            liked: !existingLike,
-            totalLikes: project.likeCount 
-        });
-    } catch (error) {
-        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'An error occurred' });
+    if (existingLike) {
+        await ProjectLikes.findByIdAndDelete(existingLike._id);
+        project.likeCount = Math.max(0, project.likeCount - 1);
+        user.watchList.pull(projectId); // .pull() removes an item from the Mongoose array
+    } else {
+        await new ProjectLikes({ projectId, userId }).save();
+        project.likeCount += 1; 
+        user.watchList.push(projectId); // .push() adds an item to the array
     }
-};
+    
+    await project.save(); 
+    await user.save(); 
+
+    return res.status(StatusCodes.OK).json({
+        liked: !existingLike,
+        totalLikes: project.likeCount 
+    });
+});
 
 module.exports =  { 
     displaySearchProjects,

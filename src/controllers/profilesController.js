@@ -35,18 +35,13 @@ const getUserProfile = async (req, res) => {
 const updateUserProfile = async (req, res) => {
     const userId = req.user.userId;
     const updateData = req.body;
-    const profileIdToUpdate = req.params.userId; 
     try {
         if ('password' in updateData || 'email' in updateData || 'passwordResetToken' in updateData) {
             return res.status(StatusCodes.BAD_REQUEST).json({
                 message: 'Direct updates to email, password, or password reset token are not allowed through this endpoint.'
             });
         }
-
-        if (userId !== profileIdToUpdate) {
-            return res.status(StatusCodes.FORBIDDEN).json({ message: 'You can only update your own profile.' });
-        }
-
+        
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true })
             .select('-password -email -passwordResetToken');
 
