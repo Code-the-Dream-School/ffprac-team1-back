@@ -26,7 +26,7 @@ const suggestSearchWord = asyncWrapper(async (req, res) => {
 
     const matchingProjects = await Project.find(
         { $or: searchQueries }, // Query
-        { applicants: 0, participants: 0, createdBy: 0, likeCount: 0 }
+        { applicants: 0, participants: 0, createdBy: 0, likeCount: 0, createdAt: 0 }
         );
     
     //initialize an empty set to store distinct words
@@ -88,12 +88,17 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
                 `${Object.values(projectObj.technologies).flat().join(' ')} ${projectObj.rolesNeeded.join(' ')}`.toLowerCase();
             projectObj.missingWords = searchWords.filter(word => 
                 !searchableText.includes(word.toLowerCase()));
-            
+
+            const isAuthorized = req.user && req.user.userId ;
+            if (!isAuthorized) {
+                delete projectObj.createdBy; 
+                delete projectObj.participants; 
+                delete projectObj.applicants;   
+            }
             const isCreator = req.user && projectObj.createdBy.toString() === req.user.userId;
             if (!isCreator) {
-                //hiding applicants and participantsif not creator
-                delete projectObj.applicants;
-                delete projectObj.participants;            
+                //hiding applicants if the user is not a creator
+                delete projectObj.applicants;       
             }
             
             return projectObj;
@@ -116,10 +121,17 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
 
         const processedProjects = projects.map(project => {
             const projectObj = project.toObject();
+
+            const isAuthorized = req.user && req.user.userId ;
+            if (!isAuthorized) {
+                delete projectObj.createdBy; 
+                delete projectObj.participants; 
+                delete projectObj.applicants;   
+            }
+            
             const isCreator = req.user && projectObj.createdBy.toString() === req.user.userId;
             if (!isCreator) {
-                delete projectObj.applicants;
-                delete projectObj.participants;            
+                delete projectObj.applicants;        
             }
             return projectObj;
         });
@@ -144,6 +156,7 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
         throw new NotFoundError('The project does not exist');
     }
 
+    const isAuthorized = req.user && req.user.userId ;
     const isCreator = req.user && req.user.userId === project.createdBy.toString();
 
     let response = {
@@ -153,8 +166,8 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
         likes: project.likes,
         technologies: project.technologies,
         rolesNeeded: project.rolesNeeded,
-        createdBy: req.user && req.user.userId ? project.createdBy : undefined,
-        participants: req.user && req.user.userId ? project.participants : undefined,
+        createdBy: isAuthorized ? project.createdBy : undefined,
+        participants: isAuthorized ? project.participants : undefined,
         applicants: isCreator ? project.applicants : undefined,
     };
 

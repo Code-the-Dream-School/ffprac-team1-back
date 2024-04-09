@@ -40,6 +40,6 @@ router.route("/:projectId")
 
 // PUT /api/v1/projects/:projectId/like'
 router.route("/:projectId/like")
-    .put(authenticationMiddleware, toggleLike);
+    .patch(authenticationMiddleware, toggleLike);
 
 module.exports = router;
