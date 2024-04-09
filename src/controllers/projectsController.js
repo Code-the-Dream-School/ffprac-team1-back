@@ -79,7 +79,7 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
                                 .skip(skip)
                                 .limit(limit);
 
-            //calculating missing words for each project
+        //calculating missing words for each project
         const detailedResults = await Promise.all(results.map(project => {
             const projectObj = project.toObject();
             
@@ -182,7 +182,6 @@ const createProject = asyncWrapper(async (req, res, next) => {
         createdBy 
     };
 
-    delete projectData.likes;
     delete projectData.applicants;
     delete projectData.participants;
     
