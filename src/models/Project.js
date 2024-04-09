@@ -70,6 +70,19 @@ const ProjectSchema = new mongoose.Schema({
   },
 }, { timestamps: true }); 
 
+ProjectSchema.index({
+  title: 'text',
+  description: 'text',
+  'technologies.frontend': 'text',
+  'technologies.backend': 'text',
+  'technologies.design': 'text',
+  'technologies.projectManagement': 'text',
+  'technologies.devOps': 'text',
+  'technologies.qualityAssurance': 'text',
+  'technologies.database': 'text',
+  rolesNeeded: 'text'
+});
+
 const ProjectModel = mongoose.model("Project", ProjectSchema, "Projects");
 
 module.exports = ProjectModel;
