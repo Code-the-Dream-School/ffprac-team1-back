@@ -4,6 +4,9 @@ const profilesController = require('../controllers/profilesController');
 const authenticationMiddleware = require('../middleware/authentication');
 
 // GET /api/v1/profiles/:userId
+router.get('/', authenticationMiddleware, profilesController.getOwnProfile);
+
+// GET /api/v1/profiles/:userId
 router.get('/:userId', authenticationMiddleware, profilesController.getUserProfile);
 
 //PATCH /api/v1/profiles/:userId

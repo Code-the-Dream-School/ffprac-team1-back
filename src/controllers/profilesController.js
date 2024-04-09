@@ -1,12 +1,28 @@
 const { StatusCodes } = require('http-status-codes');
 const User = require('../models/User');
 
+const getOwnProfile =  async (req, res) => {
+    const userId = req.user.userId;
+    try {
+        const profile = await User.findById(userId)
+            .populate('ownProjects')
+            .populate('watchList')
+            .select('-password -passwordResetToken -passwordResetTokenExpiry');
+        if (!profile) {
+            return res.status(404).json({ message: 'The profile is not found' });
+        }
+        res.json({ profile });
+    } catch (error) {
+        res.status(500).json({ message: 'The profile is unavailable. Try again later please' });
+    }
+}
+
 const getUserProfile = async (req, res) => {
     const idToSearch = req.params.userId;
     try {
         const profile = await User.findById(idToSearch)
             .populate('ownProjects')
-            .select('-password -passwordResetToken'); 
+            .select('-password -passwordResetToken -passwordResetTokenExpiry -email -watchList'); 
         if (!profile) {
             return res.status(404).json({ message: 'The profile is not found' });
         }
@@ -44,4 +60,4 @@ const updateUserProfile = async (req, res) => {
     }
 };
 
-module.exports = { getUserProfile, updateUserProfile };
+module.exports = { getOwnProfile, getUserProfile, updateUserProfile };

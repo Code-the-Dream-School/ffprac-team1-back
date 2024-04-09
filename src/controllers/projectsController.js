@@ -259,17 +259,25 @@ const toggleLike = async (req, res) => {
         }
     
         const existingLike = await ProjectLikes.findOne({ projectId, userId });
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
+        }
     
         if (existingLike) {
             await ProjectLikes.findByIdAndDelete(existingLike._id);
             project.likeCount = Math.max(0, project.likeCount - 1);
+            user.watchList.pull(projectId); // .pull() removes an item from the Mongoose array
         } else {
             await new ProjectLikes({ projectId, userId }).save();
             project.likeCount += 1; 
+            user.watchList.push(projectId); // .push() adds an item to the array
         }
     
         await project.save(); 
-    
+        await user.save(); 
+        
         return res.status(StatusCodes.OK).json({
             liked: !existingLike,
             totalLikes: project.likeCount 
@@ -278,6 +286,7 @@ const toggleLike = async (req, res) => {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'An error occurred' });
     }
 };
+
 module.exports =  { 
     displaySearchProjects,
     getProjectDetails,
