@@ -70,7 +70,6 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
 
     if (search) {
         const searchWords = search.split(/[\s,.;+]+/).filter(word => word.length > 0);
-
         const query = { $text: { $search: search } };
         const projection = { score: { $meta: "textScore" } };
         const sort = { score: { $meta: "textScore" } };
@@ -84,8 +83,10 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
         const detailedResults = await Promise.all(results.map(project => {
             const projectObj = project.toObject();
             
-            const searchableText = `${projectObj.title} ${projectObj.description} ` +
+            let searchableText = `${projectObj.title} ${projectObj.description} ` +
                 `${Object.values(projectObj.technologies).flat().join(' ')} ${projectObj.rolesNeeded.join(' ')}`.toLowerCase();
+            searchableText= searchableText.toLowerCase();
+
             projectObj.missingWords = searchWords.filter(word => 
                 !searchableText.includes(word.toLowerCase()));
 
