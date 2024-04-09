@@ -81,7 +81,7 @@ ProjectSchema.index({
   'technologies.qualityAssurance': 'text',
   'technologies.database': 'text',
   rolesNeeded: 'text'
-});
+}, { default_language: "none" });
 
 const ProjectModel = mongoose.model("Project", ProjectSchema, "Projects");
 

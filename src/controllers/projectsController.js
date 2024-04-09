@@ -26,7 +26,7 @@ const suggestSearchWord = asyncWrapper(async (req, res) => {
     ];
 
     const matchingProjects = await Project.find(
-        { $or: searchQueries }, // Query
+        { $or: searchQueries }, 
         { applicants: 0, participants: 0, createdBy: 0, likeCount: 0, createdAt: 0 }
         );
     
@@ -73,7 +73,7 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
         const searchWords = search.split(/[\s,.;+]+/).filter(word => word.length > 0);
         const query = { $text: { $search: search } };
         const projection = { score: { $meta: "textScore" } };
-        const sort = { score: { $meta: "textScore" } };
+        const sort = { score: { $meta: "textScore" }, _id: 1 };
         //fetching the results from MongoDB
         const results = await Project.find(query, projection)
                                 .sort(sort)
