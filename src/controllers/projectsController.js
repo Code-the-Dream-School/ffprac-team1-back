@@ -1,4 +1,5 @@
 const Project = require("../models/Project");
+const User = require("../models/User");
 const ProjectLikes = require('../models/ProjectLikes'); 
 const asyncWrapper = require("../middleware/async-wrapper");
 const { NotFoundError } = require ("../errors");
@@ -186,6 +187,9 @@ const createProject = asyncWrapper(async (req, res, next) => {
     delete projectData.participants;
     
     const project = await Project.create(projectData); 
+
+    await User.findByIdAndUpdate(createdBy, { $push: { ownProjects: project._id } });
+
     res.status(StatusCodes.CREATED).json({ project }); 
 });
     

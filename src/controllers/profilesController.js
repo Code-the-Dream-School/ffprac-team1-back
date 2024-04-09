@@ -5,6 +5,7 @@ const getUserProfile = async (req, res) => {
     const idToSearch = req.params.userId;
     try {
         const profile = await User.findById(idToSearch)
+            .populate('ownProjects')
             .select('-password -passwordResetToken'); 
         if (!profile) {
             return res.status(404).json({ message: 'The profile is not found' });
