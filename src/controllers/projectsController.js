@@ -4,6 +4,63 @@ const asyncWrapper = require("../middleware/async-wrapper");
 const { NotFoundError } = require ("../errors");
 const { StatusCodes } = require("http-status-codes");
 
+const suggestSearchWord = asyncWrapper(async (req, res) => {
+    const query = req.query.q; 
+    if (!query) {
+        return res.json([]);
+    }
+    
+    const regexPattern = new RegExp(query, 'i'); 
+    const searchQueries = [
+        { title: { $regex: regexPattern } },
+        { description: { $regex: regexPattern } },
+        { "technologies.frontend": { $regex: regexPattern } },
+        { "technologies.backend": { $regex: regexPattern } },
+        { "technologies.design": { $regex: regexPattern } },
+        { "technologies.projectManagement": { $regex: regexPattern } },
+        { "technologies.devOps": { $regex: regexPattern } },
+        { "technologies.qualityAssurance": { $regex: regexPattern } },
+        { "technologies.database": { $regex: regexPattern } },
+        { rolesNeeded: { $regex: regexPattern } },
+    ];
+
+    const matchingProjects = await Project.find(
+        { $or: searchQueries }, // Query
+        { applicants: 0, participants: 0, createdBy: 0, likeCount: 0 }
+        );
+    
+    //initialize an empty set to store distinct words
+    const distinctWords = new Set();
+
+    //iterate over each project and extract distinct words from relevant fields
+    matchingProjects.forEach(project => {
+        //extract words from the title, description, status, and rolesNeeded fields
+        const { title, description, status, rolesNeeded } = project;
+        addMatchingWordsToSet(title);
+        addMatchingWordsToSet(description);
+        addMatchingWordsToSet(status);
+        rolesNeeded.forEach(role => addMatchingWordsToSet(role));
+
+        //extract words from the technologies field
+        const technologies = Object.values(project.technologies).flat().join(' ');
+        addMatchingWordsToSet(technologies);
+    });
+
+    //convert the set to an array and send as response
+    const distinctWordsArray = Array.from(distinctWords);
+    res.json(distinctWordsArray);
+
+    // helper function to add matching words to the set, splitting them by non-word characters
+    function addMatchingWordsToSet(text) {
+        const words = text.split(/\W+/);
+        words.forEach(word => {
+            if (word.toLowerCase().includes(query.toLowerCase())) {
+                distinctWords.add(word.toLowerCase());
+            }
+        });
+    }
+})
+
 const displaySearchProjects = asyncWrapper(async (req, res) => {
     let { page, limit, search } = req.query;
 
@@ -11,75 +68,70 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
     limit = Number(limit) || 10;
     const skip = (page - 1) * limit;
 
-    try {
-        if (search) {
-            const searchWords = search.split(/[\s,.;+]+/).filter(word => word.length > 0);
+    if (search) {
+        const searchWords = search.split(/[\s,.;+]+/).filter(word => word.length > 0);
 
-            const query = { $text: { $search: search } };
-            const projection = { score: { $meta: "textScore" } };
-            const sort = { score: { $meta: "textScore" } };
-
-            //fetching the results from MongoDB
-            const results = await Project.find(query, projection)
-                                            .sort(sort)
-                                            .skip(skip)
-                                            .limit(limit);
+        const query = { $text: { $search: search } };
+        const projection = { score: { $meta: "textScore" } };
+        const sort = { score: { $meta: "textScore" } };
+        //fetching the results from MongoDB
+        const results = await Project.find(query, projection)
+                                .sort(sort)
+                                .skip(skip)
+                                .limit(limit);
 
             //calculating missing words for each project
-            const detailedResults = await Promise.all(results.map(project => {
-                const projectObj = project.toObject();
+        const detailedResults = await Promise.all(results.map(project => {
+            const projectObj = project.toObject();
             
-                const searchableText = `${projectObj.title} ${projectObj.description} ` +
-                    `${Object.values(projectObj.technologies).flat().join(' ')} ${projectObj.rolesNeeded.join(' ')}`.toLowerCase();
-                projectObj.missingWords = searchWords.filter(word => 
-                    !searchableText.includes(word.toLowerCase()));
+            const searchableText = `${projectObj.title} ${projectObj.description} ` +
+                `${Object.values(projectObj.technologies).flat().join(' ')} ${projectObj.rolesNeeded.join(' ')}`.toLowerCase();
+            projectObj.missingWords = searchWords.filter(word => 
+                !searchableText.includes(word.toLowerCase()));
             
-                const isCreator = req.user && projectObj.createdBy.toString() === req.user.userId;
-                if (!isCreator) {
-                    //hiding applicants and participantsif not creator
-                    delete projectObj.applicants;
-                    delete projectObj.participants;            
-                }
+            const isCreator = req.user && projectObj.createdBy.toString() === req.user.userId;
+            if (!isCreator) {
+                //hiding applicants and participantsif not creator
+                delete projectObj.applicants;
+                delete projectObj.participants;            
+            }
             
-                return projectObj;
-            }));
-            const totalProjects = await Project.countDocuments(query);
-            const totalPages = Math.ceil(totalProjects / limit);
+            return projectObj;
+        }));
+        const totalProjects = await Project.countDocuments(query);
+        const totalPages = Math.ceil(totalProjects / limit);
 
-            //returning detailedResults with the missing words information
-            res.status(StatusCodes.OK).json({
-                count: detailedResults.length,
-                totalPages,
-                page,
-                limit,
-                data: detailedResults,
-            });
-        } else {
-            const projects = await Project.find().skip(skip).limit(limit);
-            const totalProjects = await Project.countDocuments();
-            const totalPages = Math.ceil(totalProjects / limit);
+        //returning detailedResults with the missing words information
+        res.status(StatusCodes.OK).json({
+            count: detailedResults.length,
+            totalPages,
+            page,
+            limit,
+            data: detailedResults,
+        });
+    } else {
+        const projects = await Project.find().skip(skip).limit(limit);
+        const totalProjects = await Project.countDocuments();
+        const totalPages = Math.ceil(totalProjects / limit);
 
-            const processedProjects = projects.map(project => {
-                const projectObj = project.toObject();
-                const isCreator = req.user && projectObj.createdBy.toString() === req.user.userId;
-                if (!isCreator) {
-                    delete projectObj.applicants;
-                    delete projectObj.participants;            
-                }
-                return projectObj;
-            });
+        const processedProjects = projects.map(project => {
+            const projectObj = project.toObject();
+            const isCreator = req.user && projectObj.createdBy.toString() === req.user.userId;
+            if (!isCreator) {
+                delete projectObj.applicants;
+                delete projectObj.participants;            
+            }
+            return projectObj;
+        });
 
 
-            res.status(StatusCodes.OK).json({
-                count: processedProjects.length,
-                totalPages,
-                page,
-                limit,
-                data: processedProjects,
-            });
-        }
-    } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+        res.status(StatusCodes.OK).json({
+            count: processedProjects.length,
+            totalPages,
+            page,
+            limit,
+            data: processedProjects,
+        });
     }
 });
 
@@ -212,6 +264,7 @@ const toggleLike = async (req, res) => {
 module.exports =  { 
     displaySearchProjects,
     getProjectDetails,
+    suggestSearchWord,
     createProject,
     editProject,
     deleteProject,

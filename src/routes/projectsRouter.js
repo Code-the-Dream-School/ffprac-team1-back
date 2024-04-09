@@ -5,6 +5,7 @@ const validate = require('../middleware/validationResultHandler');
 const { 
     displaySearchProjects,
     getProjectDetails,
+    suggestSearchWord,
     createProject,
     editProject,
     deleteProject,
@@ -20,6 +21,10 @@ router.route("/")
 // POST /api/v1/projects
 router.route("/")
     .post(authenticationMiddleware, projectCreationRules(), validate, createProject);
+
+// GET /api/v1/projects/suggestions
+router.route("/suggestions")
+.get(suggestSearchWord);
 
 // GET /api/v1/projects/:projectId
 router.route("/:projectId")
