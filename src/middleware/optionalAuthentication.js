@@ -2,24 +2,20 @@ const jwt = require('jsonwebtoken');
 const { UnauthenticatedError } = require('../errors');
 
 const optionalAuthenticationMiddleware = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer')) {
+  const token = req.signedCookies.token;
+  
+  if (!token) {
     return next(); 
   }
-  const token = authHeader.split(' ')[1];
+  
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const { userId } = payload;
-    req.user = { userId };
-    next();
+    req.user = { userId: payload.userId };
   } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      err.userMessage = 'Session expired, please login again.';
-      throw err;
-    } else {
-      throw new UnauthenticatedError('Authentication invalid');
-    }
+    console.log(`Optional authentication attempt failed: ${err.message}`);
+    req.isAuthAttemptedButFailed = true;
   }
+  next();
 };
 
 module.exports = optionalAuthenticationMiddleware;

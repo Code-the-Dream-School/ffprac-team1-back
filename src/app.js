@@ -18,8 +18,6 @@ const profilesRouter = require("./routes/profilesRouter")
 const connectDB = require("./db/db")
 connectDB()
 
-// Generate a random secret key for cookies
-const secretKey = crypto.randomBytes(32).toString("hex")
 // middleware
 app.use(cors({
     origin: "http://localhost:3000",
@@ -30,7 +28,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(logger("dev"))
 app.use(express.static("public"))
 app.use(favicon(__dirname + "/public/favicon.ico"))
-app.use(cookieParser(secretKey)) // cookie-parser middleware with the generated secret key
+app.use(cookieParser(process.env.JWT_SECRET)) //the secret key should match the one we sign the cookie with
 
 // routes
 app.use("/api/v1/projects", projectsRouter)
