@@ -168,9 +168,9 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
         likes: project.likes,
         technologies: project.technologies,
         rolesNeeded: project.rolesNeeded,
-        createdBy: isAuthorized ? project.createdBy : undefined,
-        participants: isAuthorized ? project.participants : undefined,
-        applicants: isCreator ? project.applicants : undefined,
+        createdBy: isAuthorized ? project.createdBy : null,
+        participants: isAuthorized ? project.participants : null,
+        applicants: isCreator ? project.applicants : null,
     };
 
     res.status(StatusCodes.OK).json({ project: response });
@@ -208,14 +208,16 @@ const editProject = asyncWrapper(async (req, res, next) => {
     }
 
     const updateData = {};
+    //handling the correct technologies update due to their complex structure
     if (req.body.technologies) {
         for (const [key, value] of Object.entries(req.body.technologies)) {
             updateData[`technologies.${key}`] = value;
         }
     }
-
+    
+    //prohibit from editing the likes number
     Object.entries(req.body).forEach(([key, value]) => {
-        if (key !== 'technologies') {
+        if (key !== 'technologies' && key !== 'likeCount') {
             updateData[key] = value;
         }
     });
