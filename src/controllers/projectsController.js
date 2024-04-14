@@ -179,7 +179,6 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
 })
 
 const createProject = asyncWrapper(async (req, res, next) => {
-    console.log("here")
     const { userId: createdBy } = req.user;
     const projectData = {
         ...req.body,
@@ -191,8 +190,7 @@ const createProject = asyncWrapper(async (req, res, next) => {
     delete projectData.participants;
     
     const project = await Project.create(projectData); 
-console.log(projectData)
-console.log(project)
+
     await User.findByIdAndUpdate(createdBy, { $push: { ownProjects: project._id } });
 
     res.status(StatusCodes.CREATED).json({ project }); 
