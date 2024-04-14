@@ -1,9 +1,22 @@
+
+const cloudinary = require('cloudinary').v2; 
+const fs = require('fs').promises;
 const Project = require("../models/Project");
 const User = require("../models/User");
 const ProjectLikes = require('../models/ProjectLikes'); 
 const asyncWrapper = require("../middleware/async-wrapper");
 const { NotFoundError } = require ("../errors");
 const { StatusCodes } = require("http-status-codes");
+
+const DEFAULT_PROJECT_IMAGE_URL =
+    'https://images.unsplash.com/photo-1633409361618-c73427e4e206?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTcwNzkzNDI4Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080';
+
+const DEFAULT_PROJECT_IMAGE_PUBLIC_ID = 'default_project_image';
+
+const DEFAULT_COVER_PROJECT_IMAGE_URL =
+    'https://images.unsplash.com/photo-1491895200222-0fc4a4c35e18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY5OTYzNjc1Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080';
+
+const DEFAULT_COVER_PROJECT_PUBLIC_ID = 'default_project_cover_image';
 
 const suggestSearchWord = asyncWrapper(async (req, res) => {
     const query = req.query.q; 
@@ -185,6 +198,11 @@ const createProject = asyncWrapper(async (req, res, next) => {
         createdBy 
     };
 
+    projectData.projectPictureUrl = DEFAULT_PROJECT_IMAGE_URL; 
+    projectData.projectPicturePublicId = DEFAULT_PROJECT_IMAGE_PUBLIC_ID;
+
+    projectData.projectCoverPictureUrl = DEFAULT_COVER_PROJECT_IMAGE_URL; 
+    projectData.projectCoverPicturePublicId = DEFAULT_COVER_PROJECT_PUBLIC_ID;
 
     delete projectData.applicants;
     delete projectData.participants;
@@ -218,12 +236,27 @@ const editProject = asyncWrapper(async (req, res, next) => {
         }
     }
     
-    //prohibit from editing the likes number
+    //prohibiting from editing the likes number
     Object.entries(req.body).forEach(([key, value]) => {
         if (key !== 'technologies' && key !== 'likeCount') {
             updateData[key] = value;
         }
     });
+
+    if (req.files['projectPicture'] && req.files['projectPicture'][0]) {
+        const projectPictureResponse = await cloudinary.v2.uploader.upload(req.files['projectPicture'][0].path);
+        await fs.unlink(req.files['projectPicture'][0].path); //сleaning up the temporary file
+        project.projectPictureUrl = projectPictureResponse.secure_url;
+        project.projectPicturePublicId = projectPictureResponse.public_id;
+    }
+    
+    if (req.files['coverProjectPicture'] && req.files['coverProjectPicture'][0]) {
+        const coverPictureResponse = await cloudinary.v2.uploader.upload(req.files['coverProjectPicture'][0].path);
+        await fs.unlink(req.files['coverProjectPicture'][0].path); //сleaning up the temporary file
+        project.projectCoverPictureUrl = coverPictureResponse.secure_url;
+        project.projectCoverPicturePublicId = coverPictureResponse.public_id;
+    }
+
 
     const updatedProject = await Project.findByIdAndUpdate(
         projectId,
@@ -246,6 +279,14 @@ const deleteProject = asyncWrapper(async (req, res, next) => {
 
     if (project.createdBy.toString() !== userId) {
         return res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have permission to delete this project.' });
+    }
+
+    if (project.projectPicturePublicId) {
+        await cloudinary.v2.uploader.destroy(project.projectPicturePublicId);
+    }
+    
+    if (project.projectCoverPicturePublicId) {
+        await cloudinary.v2.uploader.destroy(project.projectCoverPicturePublicId);
     }
 
     await Project.findByIdAndDelete(projectId); 
