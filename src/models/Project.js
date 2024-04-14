@@ -59,9 +59,15 @@ const ProjectSchema = new mongoose.Schema({
     type: String,
     validate: [validateURL, 'Please provide a valid URL.'], 
   },
+  projectPicturePublicId: {
+    type: String,
+  },
   projectCoverPictureUrl: {
     type: String,
     validate: [validateURL, 'Please provide a valid URL.'], 
+  },
+  projectCoverPicturePublicId: {
+    type: String,
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
