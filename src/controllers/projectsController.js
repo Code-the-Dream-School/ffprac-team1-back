@@ -83,9 +83,11 @@ const displaySearchProjects = asyncWrapper(async (req, res) => {
         //calculating missing words for each project
         const detailedResults = await Promise.all(results.map(project => {
             const projectObj = project.toObject();
-            
+
             let searchableText = `${projectObj.title} ${projectObj.description} ` +
-                `${Object.values(projectObj.technologies).flat().join(' ')} ${projectObj.rolesNeeded.join(' ')}`.toLowerCase();
+                (projectObj.technologies ? `${Object.values(projectObj.technologies).flat().join(' ')}` : '') +
+                ` ${projectObj.rolesNeeded.join(' ')}`;
+
             searchableText= searchableText.toLowerCase();
 
             projectObj.missingWords = searchWords.filter(word => 
@@ -177,17 +179,20 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
 })
 
 const createProject = asyncWrapper(async (req, res, next) => {
+    console.log("here")
     const { userId: createdBy } = req.user;
     const projectData = {
         ...req.body,
         createdBy 
     };
 
+
     delete projectData.applicants;
     delete projectData.participants;
     
     const project = await Project.create(projectData); 
-
+console.log(projectData)
+console.log(project)
     await User.findByIdAndUpdate(createdBy, { $push: { ownProjects: project._id } });
 
     res.status(StatusCodes.CREATED).json({ project }); 
