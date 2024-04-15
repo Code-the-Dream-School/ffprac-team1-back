@@ -8,16 +8,6 @@ const asyncWrapper = require("../middleware/async-wrapper");
 const { NotFoundError } = require ("../errors");
 const { StatusCodes } = require("http-status-codes");
 
-const DEFAULT_PROJECT_IMAGE_URL =
-    'https://images.unsplash.com/photo-1633409361618-c73427e4e206?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTcwNzkzNDI4Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080';
-
-const DEFAULT_PROJECT_IMAGE_PUBLIC_ID = 'default_project_image';
-
-const DEFAULT_COVER_PROJECT_IMAGE_URL =
-    'https://images.unsplash.com/photo-1491895200222-0fc4a4c35e18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY5OTYzNjc1Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080';
-
-const DEFAULT_COVER_PROJECT_PUBLIC_ID = 'default_project_cover_image';
-
 const suggestSearchWord = asyncWrapper(async (req, res) => {
     const query = req.query.q; 
     if (!query) {
@@ -244,26 +234,46 @@ const editProject = asyncWrapper(async (req, res, next) => {
     });
 
     if (req.files['projectPicture'] && req.files['projectPicture'][0]) {
-        const projectPictureResponse = await cloudinary.v2.uploader.upload(req.files['projectPicture'][0].path);
-        await fs.unlink(req.files['projectPicture'][0].path); //сleaning up the temporary file
-        project.projectPictureUrl = projectPictureResponse.secure_url;
-        project.projectPicturePublicId = projectPictureResponse.public_id;
+        try {
+            //deleting the old image from Cloudinary if it exists
+            if (project.projectPicturePublicId) {
+                await cloudinary.uploader.destroy(project.projectPicturePublicId);
+            }
+            
+            //uploading new image to Cloudinary
+            const filePath = req.files['projectPicture'][0].path;
+            const projectPictureResponse = await cloudinary.uploader.upload(filePath);
+            await fs.unlink(req.files['projectPicture'][0].path); // Cleaning up the temporary file
+            updateData['projectPictureUrl'] = projectPictureResponse.secure_url;
+            updateData['projectPicturePublicId'] = projectPictureResponse.public_id;
+        } catch (error) {
+            console.error("Error uploading to Cloudinary:", error);
+            return res.status(500).json({ message: "Failed to upload image", error: error.message });
+        }
     }
     
     if (req.files['coverProjectPicture'] && req.files['coverProjectPicture'][0]) {
-        const coverPictureResponse = await cloudinary.v2.uploader.upload(req.files['coverProjectPicture'][0].path);
-        await fs.unlink(req.files['coverProjectPicture'][0].path); //сleaning up the temporary file
-        project.projectCoverPictureUrl = coverPictureResponse.secure_url;
-        project.projectCoverPicturePublicId = coverPictureResponse.public_id;
+        try {
+            if (project.projectCoverPicturePublicId) {
+                await cloudinary.uploader.destroy(project.projectCoverPicturePublicId);
+            }
+            const filePath = req.files['coverProjectPicture'][0].path;
+            const coverPictureResponse = await cloudinary.uploader.upload(filePath);
+            await fs.unlink(req.files['coverProjectPicture'][0].path); //сleaning up the temporary file
+            updateData['projectCoverPictureUrl'] = coverPictureResponse.secure_url;
+            updateData['projectCoverPicturePublicId'] = coverPictureResponse.public_id;
+        } catch {
+            console.error("Error uploading to Cloudinary:", error);
+            return res.status(500).json({ message: "Failed to upload cover image", error: error.message });
+        }
     }
-
 
     const updatedProject = await Project.findByIdAndUpdate(
         projectId,
         { $set: updateData }, 
         { new: true, runValidators: true } 
     );
-
+    console.log("updatedProject", updatedProject)
     res.status(StatusCodes.OK).json({ project: updatedProject });
 })
 

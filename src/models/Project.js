@@ -57,17 +57,21 @@ const ProjectSchema = new mongoose.Schema({
   }],
   projectPictureUrl: {
     type: String,
+    default: 'https://images.unsplash.com/photo-1633409361618-c73427e4e206?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTcwNzkzNDI4Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080',
     validate: [validateURL, 'Please provide a valid URL.'], 
   },
   projectPicturePublicId: {
     type: String,
+    default: 'default_project_image'
   },
   projectCoverPictureUrl: {
     type: String,
+    default: 'https://images.unsplash.com/photo-1491895200222-0fc4a4c35e18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY5OTYzNjc1Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080',
     validate: [validateURL, 'Please provide a valid URL.'], 
   },
   projectCoverPicturePublicId: {
     type: String,
+    default: 'default_project_cover_image'
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

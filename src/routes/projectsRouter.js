@@ -13,6 +13,7 @@ const {
 } = require("../controllers/projectsController");
 const authenticationMiddleware = require("../middleware/authentication");
 const optionalAuthenticationMiddleware = require("../middleware/optionalAuthentication");
+const upload = require('../middleware/multerMiddleware');
 
 // GET /api/v1/projects
 router.route("/")
@@ -32,7 +33,7 @@ router.route("/:projectId")
 
 // PATCH /api/v1/projects/:projectId
 router.route("/:projectId")
-    .patch(authenticationMiddleware, editProject);
+    .patch(authenticationMiddleware, upload, editProject);
 
 // DELETE /api/v1/projects/:projectId
 router.route("/:projectId")
