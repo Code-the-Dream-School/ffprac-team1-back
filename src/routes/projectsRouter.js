@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { projectCreationRules } = require('../middleware/validationRules');
+const { projectCreationRules, projectEditingRules } = require('../middleware/validationRules');
 const validate = require('../middleware/validationResultHandler');
 const { 
     displaySearchProjects,
@@ -33,7 +33,7 @@ router.route("/:projectId")
 
 // PATCH /api/v1/projects/:projectId
 router.route("/:projectId")
-    .patch(authenticationMiddleware, upload, editProject);
+    .patch(authenticationMiddleware, projectEditingRules(), validate, upload, editProject);
 
 // DELETE /api/v1/projects/:projectId
 router.route("/:projectId")
