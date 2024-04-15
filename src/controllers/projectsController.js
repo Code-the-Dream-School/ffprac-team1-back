@@ -233,7 +233,7 @@ const editProject = asyncWrapper(async (req, res, next) => {
         }
     });
 
-    if (req.files['projectPicture'] && req.files['projectPicture'][0]) {
+    if (req.files && req.files['projectPicture'] && req.files['projectPicture'][0]) {
         try {
             //deleting the old image from Cloudinary if it exists
             if (project.projectPicturePublicId) {
@@ -250,9 +250,9 @@ const editProject = asyncWrapper(async (req, res, next) => {
             console.error("Error uploading to Cloudinary:", error);
             return res.status(500).json({ message: "Failed to upload image", error: error.message });
         }
-    }
+    } 
     
-    if (req.files['coverProjectPicture'] && req.files['coverProjectPicture'][0]) {
+    if (req.files && req.files['coverProjectPicture'] && req.files['coverProjectPicture'][0]) {
         try {
             if (project.projectCoverPicturePublicId) {
                 await cloudinary.uploader.destroy(project.projectCoverPicturePublicId);
