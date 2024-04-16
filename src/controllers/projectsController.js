@@ -1,3 +1,6 @@
+
+const cloudinary = require('cloudinary').v2; 
+const fs = require('fs').promises;
 const Project = require("../models/Project");
 const User = require("../models/User");
 const ProjectLikes = require('../models/ProjectLikes'); 
@@ -185,6 +188,11 @@ const createProject = asyncWrapper(async (req, res, next) => {
         createdBy 
     };
 
+    projectData.projectPictureUrl = DEFAULT_PROJECT_IMAGE_URL; 
+    projectData.projectPicturePublicId = DEFAULT_PROJECT_IMAGE_PUBLIC_ID;
+
+    projectData.projectCoverPictureUrl = DEFAULT_COVER_PROJECT_IMAGE_URL; 
+    projectData.projectCoverPicturePublicId = DEFAULT_COVER_PROJECT_PUBLIC_ID;
 
     delete projectData.applicants;
     delete projectData.participants;
@@ -218,19 +226,54 @@ const editProject = asyncWrapper(async (req, res, next) => {
         }
     }
     
-    //prohibit from editing the likes number
+    //prohibiting from editing the likes number
     Object.entries(req.body).forEach(([key, value]) => {
         if (key !== 'technologies' && key !== 'likeCount') {
             updateData[key] = value;
         }
     });
 
+    if (req.files && req.files['projectPicture'] && req.files['projectPicture'][0]) {
+        try {
+            //deleting the old image from Cloudinary if it exists
+            if (project.projectPicturePublicId) {
+                await cloudinary.uploader.destroy(project.projectPicturePublicId);
+            }
+            
+            //uploading new image to Cloudinary
+            const filePath = req.files['projectPicture'][0].path;
+            const projectPictureResponse = await cloudinary.uploader.upload(filePath);
+            await fs.unlink(req.files['projectPicture'][0].path); // Cleaning up the temporary file
+            updateData['projectPictureUrl'] = projectPictureResponse.secure_url;
+            updateData['projectPicturePublicId'] = projectPictureResponse.public_id;
+        } catch (error) {
+            console.error("Error uploading to Cloudinary:", error);
+            return res.status(500).json({ message: "Failed to upload image", error: error.message });
+        }
+    } 
+    
+    if (req.files && req.files['coverProjectPicture'] && req.files['coverProjectPicture'][0]) {
+        try {
+            if (project.projectCoverPicturePublicId) {
+                await cloudinary.uploader.destroy(project.projectCoverPicturePublicId);
+            }
+            const filePath = req.files['coverProjectPicture'][0].path;
+            const coverPictureResponse = await cloudinary.uploader.upload(filePath);
+            await fs.unlink(req.files['coverProjectPicture'][0].path); //сleaning up the temporary file
+            updateData['projectCoverPictureUrl'] = coverPictureResponse.secure_url;
+            updateData['projectCoverPicturePublicId'] = coverPictureResponse.public_id;
+        } catch {
+            console.error("Error uploading to Cloudinary:", error);
+            return res.status(500).json({ message: "Failed to upload cover image", error: error.message });
+        }
+    }
+
     const updatedProject = await Project.findByIdAndUpdate(
         projectId,
         { $set: updateData }, 
         { new: true, runValidators: true } 
     );
-
+    console.log("updatedProject", updatedProject)
     res.status(StatusCodes.OK).json({ project: updatedProject });
 })
 
@@ -246,6 +289,14 @@ const deleteProject = asyncWrapper(async (req, res, next) => {
 
     if (project.createdBy.toString() !== userId) {
         return res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have permission to delete this project.' });
+    }
+
+    if (project.projectPicturePublicId) {
+        await cloudinary.v2.uploader.destroy(project.projectPicturePublicId);
+    }
+    
+    if (project.projectCoverPicturePublicId) {
+        await cloudinary.v2.uploader.destroy(project.projectCoverPicturePublicId);
     }
 
     await Project.findByIdAndDelete(projectId); 

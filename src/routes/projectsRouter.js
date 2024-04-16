@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { projectCreationRules } = require('../middleware/validationRules');
+const { projectCreationRules, projectEditingRules } = require('../middleware/validationRules');
 const validate = require('../middleware/validationResultHandler');
 const { 
     displaySearchProjects,
@@ -13,6 +13,7 @@ const {
 } = require("../controllers/projectsController");
 const authenticationMiddleware = require("../middleware/authentication");
 const optionalAuthenticationMiddleware = require("../middleware/optionalAuthentication");
+const upload = require('../middleware/multerMiddleware');
 
 // GET /api/v1/projects
 router.route("/")
@@ -32,7 +33,7 @@ router.route("/:projectId")
 
 // PATCH /api/v1/projects/:projectId
 router.route("/:projectId")
-    .patch(authenticationMiddleware, editProject);
+    .patch(authenticationMiddleware, projectEditingRules(), validate, upload, editProject);
 
 // DELETE /api/v1/projects/:projectId
 router.route("/:projectId")
