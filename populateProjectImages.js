@@ -24,7 +24,7 @@ const populateProjectImages = async () => {
         console.log('Update result:', result);
         console.log('Updated all projects with default image info.');
     } catch (error) {
-        console.error('Error populating watchList:', error);
+        console.error('Error populating projects:', error);
     } finally {
         await mongoose.disconnect();
         console.log('MongoDB disconnected');

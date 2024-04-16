@@ -273,7 +273,7 @@ const editProject = asyncWrapper(async (req, res, next) => {
         { $set: updateData }, 
         { new: true, runValidators: true } 
     );
-    console.log("updatedProject", updatedProject)
+
     res.status(StatusCodes.OK).json({ project: updatedProject });
 })
 
