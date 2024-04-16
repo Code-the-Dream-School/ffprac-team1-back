@@ -1,6 +1,6 @@
 const multer = require('multer');
 const path = require('path');
-const MAX_SIZE = 1024 * 1024 * 5; // 5MB size of image
+const MAX_SIZE = 1024 * 1024 * 8; // 8MB size of image
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -45,7 +45,9 @@ const upload = multer({
   },
 }).fields([
     { name: 'projectPicture', maxCount: 1 },
-    { name: 'coverProjectPicture', maxCount: 1 }
+    { name: 'coverProjectPicture', maxCount: 1 },
+    { name: 'profilePicture', maxCount: 1 },
+    { name: 'coverProfilePicture', maxCount: 1 },
 ]);
 
 module.exports = upload;
