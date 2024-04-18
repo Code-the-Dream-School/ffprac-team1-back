@@ -48,13 +48,47 @@ const ProjectSchema = new mongoose.Schema({
     default: 0 
   }, 
   applicants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User" 
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
+    role: {
+        type: String,
+        required: true,
+        enum: [
+            "Mentor",
+            "Frontend Developer", 
+            "Backend Developer", 
+            "Fullstack Developer", 
+            "Team Lead",
+            "UI/UX Designer", 
+            "Project Manager", 
+            "DevOps Engineer", 
+            "Quality Assurance Engineer"
+        ]
+    }
   }],
-  participants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User" 
-  }],
+  participants:[{
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
+    role: {
+        type: String,
+        required: true,
+        enum: [
+            "Mentor",
+            "Frontend Developer", 
+            "Backend Developer", 
+            "Fullstack Developer", 
+            "Team Lead",
+            "UI/UX Designer", 
+            "Project Manager", 
+            "DevOps Engineer", 
+            "Quality Assurance Engineer"
+        ]
+      }
+    }],
   projectPictureUrl: {
     type: String,
     default: 'https://images.unsplash.com/photo-1633409361618-c73427e4e206?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTcwNzkzNDI4Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080',
