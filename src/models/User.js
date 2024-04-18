@@ -5,10 +5,10 @@ const urlValidationPattern =
   /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})$/
 
 const validateURL = (url) => {
-  if (url === null) {
-    return true
+  if (!url) { 
+    return true;
   }
-  return urlValidationPattern.test(url)
+  return urlValidationPattern.test(url);
 }
 
 const UserSchema = new mongoose.Schema(
@@ -52,13 +52,23 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       default: null
     },
-    userPictureUrl: {
+    profilePictureUrl: {
       type: String,
+      default: 'https://images.unsplash.com/photo-1633409361618-c73427e4e206?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTcwNzkzNDI4Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080',
       validate: [validateURL, "Please provide a valid URL."]
+    },
+    profilePicturePublicId: {
+      type: String,
+      default: 'default_profile_image'
     },
     profileCoverPictureUrl: {
       type: String,
+      default: 'https://images.unsplash.com/photo-1491895200222-0fc4a4c35e18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY5OTYzNjc1Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080',
       validate: [validateURL, "Please provide a valid URL."]
+    },
+    profileCoverPicturePublicId: {
+      type: String,
+      default: 'default_profile_cover_image'
     },
     watchList: [
       {
