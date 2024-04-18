@@ -188,12 +188,6 @@ const createProject = asyncWrapper(async (req, res, next) => {
         createdBy 
     };
 
-    projectData.projectPictureUrl = DEFAULT_PROJECT_IMAGE_URL; 
-    projectData.projectPicturePublicId = DEFAULT_PROJECT_IMAGE_PUBLIC_ID;
-
-    projectData.projectCoverPictureUrl = DEFAULT_COVER_PROJECT_IMAGE_URL; 
-    projectData.projectCoverPicturePublicId = DEFAULT_COVER_PROJECT_PUBLIC_ID;
-
     delete projectData.applicants;
     delete projectData.participants;
     
