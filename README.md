@@ -4,6 +4,14 @@ Welcome to the back-end repository for **DevConnexion** — a platform created s
 
 This repository contains the **Node.js/Express server** code for our application, interfacing with our [Frontend Repository](https://github.com/Code-the-Dream-School/ffprac-team1-front/).
 
+
+## Table of Contents
+1. [Key Features](#key-features)
+2. [Technologies Used](#technologies-used)
+3. [Quick Start](#quick-start)
+
+---
+
 ## Key Features
 
 ### User Authentication and Management
@@ -34,6 +42,7 @@ This repository contains the **Node.js/Express server** code for our application
 - **Role-based Applications**: Apply for specific roles within projects ensuring users are matched to suitable positions based on their skills.
 - **Collaborative Opportunities**: Platform fosters collaboration by allowing users to join projects as per their expertise and interest.
 
+
 ## Technologies Used
 This application utilizes a variety of technologies and middleware for optimal performance and security:
 
@@ -54,7 +63,8 @@ This application utilizes a variety of technologies and middleware for optimal p
 - **Database and Routes:**
   - `connectDB` - Connects to MongoDB database
   - Routes for user, projects, and profiles management
-  
+
+
 ## Quick Start
 
 ### Port Configuration
@@ -64,7 +74,7 @@ This application utilizes a variety of technologies and middleware for optimal p
 ### Concurrent Running
 - **Simultaneous Operation:** Both the back-end server and the front-end app must be run at the same time to enable full functionality testing.
 
-## Local Development Setup
+### Local Development Setup
 
 1. **Repository Setup:** Create a folder to house both the front-end and back-end repositories.
 2. **Clone Repository:** Clone this back-end repository into the designated folder.
@@ -79,3 +89,5 @@ This application utilizes a variety of technologies and middleware for optimal p
 6. **Start Server:** Execute `npm run dev` to start the development server.
 7. **API Testing:** Open `http://localhost:8000/api/v1/` in your browser to test API endpoints.
 8. **Running Front-End:** After ensuring the back-end server is up, proceed to run the front-end application.
+
+---
