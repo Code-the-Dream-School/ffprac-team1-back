@@ -6,11 +6,14 @@ This repository contains the **Node.js/Express server** code for our application
 
 
 ## Table of Contents
-1. [Key Features](#key-features)
-2. [Technologies Used](#technologies-used)
-3. [Quick Start](#quick-start)
+1. [Swagger Documentation](#swagger-documentation)
+2. [Key Features](#key-features)
+3. [Technologies Used](#technologies-used)
+4. [Quick Start](#quick-start)
 
 ---
+## Swagger Documentation
+[Swagger Documentation Link](https://dev-connexion-g6sv.onrender.com/api-docs/)
 
 ## Key Features
 
