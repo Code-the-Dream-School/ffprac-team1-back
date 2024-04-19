@@ -1,0 +1,345 @@
+openapi: 3.0.3
+info:
+  title: DevConnexion API
+  description: DevConnexion is a dynamic platform created for aspiring developers, web designers, testers, and creative technology enthusiasts. It serves as a nexus where technology meets creativity, facilitating a vibrant community-driven environment for professional growth and collaboration.
+  contact:
+    email: rapnuta@gmail.com
+  version: 1.0.11
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server for the DevConnexion platform.
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+      properties:
+        firstName:
+          type: string
+          minLength: 2
+          maxLength: 30
+          example: John
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 30
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: dev.connexion@example.com
+        password:
+          type: string
+          format: password
+          minLength: 6
+        passwordResetToken:
+          type: string
+          nullable: true
+        passwordResetTokenExpiry:
+          type: string
+          format: date-time
+          nullable: true
+        profilePictureUrl:
+          type: string
+          format: uri
+          default: 'https://images.unsplash.com/photo-1633409361618-c73427e4e206?ixlib=rb-4.0.3'
+        profileCoverPictureUrl:
+          type: string
+          format: uri
+          default: 'https://images.unsplash.com/photo-1491895200222-0fc4a4c35e18?ixlib=rb-4.0.3'
+        contacts:
+          type: object
+          properties:
+            linkedIn:
+              type: string
+              format: uri
+              nullable: true
+            github:
+              type: string
+              format: uri
+              nullable: true
+            portfolioWebsite:
+              type: string
+              format: uri
+              nullable: true
+        about:
+          type: string
+          maxLength: 500
+        offer:
+          type: string
+          maxLength: 500
+        watchList:
+          type: array
+          items:
+            type: string
+            format: uuid
+        ownProjects:
+          type: array
+          items:
+            type: string
+            format: uuid
+        participatingProjects:
+          type: array
+          items:
+            type: object
+            required:
+              - project
+              - role
+            properties:
+              project:
+                type: string
+                format: uuid
+              role:
+                type: string
+                enum:
+                  - Mentor
+                  - Frontend Developer
+                  - Backend Developer
+                  - Fullstack Developer
+                  - Team Lead
+                  - UI/UX Designer
+                  - Project Manager
+                  - DevOps Engineer
+                  - Quality Assurance Engineer
+        appliedProjects:
+          type: array
+          items:
+            type: object
+            required:
+              - project
+              - role
+            properties:
+              project:
+                type: string
+                format: uuid
+              role:
+                type: string
+                enum:
+                  - Mentor
+                  - Frontend Developer
+                  - Backend Developer
+                  - Fullstack Developer
+                  - Team Lead
+                  - UI/UX Designer
+                  - Project Manager
+                  - DevOps Engineer
+                  - Quality Assurance Engineer
+
+    Project:
+      type: object
+      required:
+        - title
+        - description
+        - status
+        - createdBy
+      properties:
+        title:
+          type: string
+          maxLength: 100
+          description: 'Title of the project, not exceeding 100 characters.'
+        description:
+          type: string
+          maxLength: 700
+          description: 'Detailed description of the project, not exceeding 700 characters.'
+        status:
+          type: string
+          enum:
+            - Seeking Team Members
+            - In Progress
+            - Completed
+          default: Seeking Team Members
+        technologies:
+          $ref: '#/components/schemas/Technologies'
+        rolesNeeded:
+          type: array
+          items:
+            type: string
+            enum:
+              - Mentor
+              - Frontend Developer
+              - Backend Developer
+              - Fullstack Developer
+              - Team Lead
+              - UI/UX Designer
+              - Project Manager
+              - DevOps Engineer
+              - Quality Assurance Engineer
+        likeCount:
+          type: integer
+          default: 0
+          description: 'Total number of likes this project has received.'
+        applicants:
+          type: array
+          items:
+            type: object
+            required:
+              - user
+              - role
+            properties:
+              user:
+                type: string
+                format: uuid
+                description: Identifier of the user who applied.
+              role:
+                type: string
+                enum:
+                  - Mentor
+                  - Frontend Developer
+                  - Backend Developer
+                  - Fullstack Developer
+                  - Team Lead
+                  - UI/UX Designer
+                  - Project Manager
+                  - DevOps Engineer
+                  - Quality Assurance Engineer
+                description: Role applied for in the project.
+        participants:
+          type: array
+          items:
+            type: object
+            required:
+              - user
+              - role
+            properties:
+              user:
+                type: string
+                format: uuid
+                description: Identifier of the user who is participating.
+              role:
+                type: string
+                enum:
+                  - Mentor
+                  - Frontend Developer
+                  - Backend Developer
+                  - Fullstack Developer
+                  - Team Lead
+                  - UI/UX Designer
+                  - Project Manager
+                  - DevOps Engineer
+                  - Quality Assurance Engineer
+                description: Role of the user in the project.
+        projectPictureUrl:
+          type: string
+          format: uri
+        projectCoverPictureUrl:
+          type: string
+          format: uri
+        createdBy:
+          type: string
+          format: uuid
+          description: 'Identifier of the user who created the project.'
+    
+    Technologies:
+      type: object
+      properties:
+        frontend:
+          type: array
+          items:
+            type: string
+            enum:
+              - HTML/CSS
+              - JavaScript
+              - TypeScript
+              - React
+              - Angular
+              - Vue.js
+              - Svelte
+              - Next.js
+              - Redux
+              - Bootstrap
+              - Tailwind CSS
+              - SASS/LESS
+        backend:
+          type: array
+          items:
+            type: string
+            enum:
+              - Node.js
+              - Express.js
+              - Django
+              - Ruby on Rails
+              - Java
+              - PHP Laravel
+              - Kotlin
+              - Go
+              - C#
+        design:
+          type: array
+          items:
+            type: string
+            enum:
+              - Adobe XD
+              - Sketch
+              - Figma
+              - InVision
+              - Photoshop
+              - Illustrator
+        projectManagement:
+          type: array
+          items:
+            type: string
+            enum:
+              - Jira
+              - Trello
+              - Asana
+              - Confluence
+              - Linear
+        devOps:
+          type: array
+          items:
+            type: string
+            enum:
+              - Docker
+              - AWS
+              - Azure
+              - GCP
+              - Jenkins
+              - GitHub Actions
+              - GitLab CI/CD
+        qualityAssurance:
+          type: array
+          items:
+            type: string
+            enum:
+              - Selenium
+              - Jest
+              - Mocha
+              - Chai
+              - Cypress
+              - Postman
+              - JMeter
+        database:
+          type: array
+          items:
+            type: string
+            enum:
+              - SQL
+              - NoSQL
+              - PostgreSQL
+              - MySQL
+              - SQLite
+              - MongoDB
+              - Cassandra
+    ProjectLike:
+      type: object
+      required:
+        - projectId
+        - userId
+      properties:
+        projectId:
+          type: string
+          format: uuid
+          description: "The unique identifier of the project that was liked."
+        userId:
+          type: string
+          format: uuid
+          description: "The unique identifier of the user who liked the project."
+        likedAt:
+          type: string
+          format: date-time
+          description: "The date and time when the like was recorded."
+          default: "The current timestamp when the object is created."

@@ -1,6 +1,11 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+
+const swaggerDocument = YAML.load('./api-docs.yaml');
 //security packages
 const cors = require("cors");
 const logger = require("morgan");
@@ -29,6 +34,8 @@ const profilesRouter = require("./routes/profilesRouter");
 
 const connectDB = require("./db/db");
 connectDB();
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // middleware
 app.use(helmet()); //adds security headers to protect from vulnerabilities
