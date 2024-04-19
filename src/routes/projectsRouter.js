@@ -9,7 +9,11 @@ const {
     createProject,
     editProject,
     deleteProject,
-    toggleLike
+    toggleLike,
+    applyToParticipate,
+    approveApplicant,
+    rejectApplicant,
+    removeParticipant
 } = require("../controllers/projectsController");
 const authenticationMiddleware = require("../middleware/authentication");
 const optionalAuthenticationMiddleware = require("../middleware/optionalAuthentication");
@@ -42,5 +46,21 @@ router.route("/:projectId")
 // PUT /api/v1/projects/:projectId/like'
 router.route("/:projectId/like")
     .patch(authenticationMiddleware, toggleLike);
+
+// POST /api/v1/projects/:projectId/apply"
+router.route("/:projectId/apply")
+    .post(authenticationMiddleware, applyToParticipate);
+
+// POST /api/v1/projects/:projectId/approve/:applicationId'"
+router.route("/:projectId/approve/:applicationId")
+    .post(authenticationMiddleware, approveApplicant);
+
+// POST /api/v1/projects/:projectId/reject/:applicationId'"
+router.route("/:projectId/reject/:applicationId")
+    .post(authenticationMiddleware, rejectApplicant);
+
+// DELETE /api/v1/projects/:projectId/participants/:participantId'"
+router.route("/:projectId/participants/:participantId")
+    .delete(authenticationMiddleware, removeParticipant);
 
 module.exports = router;

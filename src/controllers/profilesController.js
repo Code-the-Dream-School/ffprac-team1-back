@@ -21,7 +21,7 @@ const getUserProfile = asyncWrapper(async (req, res) => {
     const idToSearch = req.params.userId;
     const profile = await User.findById(idToSearch)
     .populate('ownProjects')
-    .select('-password -passwordResetToken -passwordResetTokenExpiry -email -watchList'); 
+    .select('-password -passwordResetToken -passwordResetTokenExpiry -watchList'); 
     if (!profile) {
         throw new NotFoundError('The profile is not found' );
     }

@@ -115,15 +115,52 @@ const UserSchema = new mongoose.Schema(
         ref: "Project"
       }
     ],
-    participatingProjects: [
-      {
+    participatingProjects: [{
+        project: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Project"
+        },
+        role: {
+          type: String,
+          required: true,
+          enum: [
+              "Mentor",
+              "Frontend Developer", 
+              "Backend Developer", 
+              "Fullstack Developer", 
+              "Team Lead",
+              "UI/UX Designer", 
+              "Project Manager", 
+              "DevOps Engineer", 
+              "Quality Assurance Engineer"
+          ]
+        }
+      }],
+    appliedProjects: [{
+      project: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Project"
+      },
+      role: {
+        type: String,
+        required: true,
+        enum: [
+            "Mentor",
+            "Frontend Developer", 
+            "Backend Developer", 
+            "Fullstack Developer", 
+            "Team Lead",
+            "UI/UX Designer", 
+            "Project Manager", 
+            "DevOps Engineer", 
+            "Quality Assurance Engineer"
+        ]
       }
-    ]
+    }],
   },
   { timestamps: true }
 )
+
 // Hash the password before saving
 UserSchema.pre("save", async function (next) {
   const user = this

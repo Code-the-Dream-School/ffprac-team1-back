@@ -333,6 +333,172 @@ const toggleLike = asyncWrapper(async (req, res, next) => {
     });
 });
 
+
+const applyToParticipate = asyncWrapper(async (req, res, next) => {
+    const projectId = req.params.projectId;
+    const userId = req.user.userId; 
+    const { role } = req.body;
+
+    if (!role) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Role is required but not provided.' });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    //checking if the role applied for is in the rolesNeeded list
+    if (!project.rolesNeeded.includes(role)) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'This role is not required in this project.' });
+    }
+
+    //checking if the role is already taken by a participant
+    const isRoleTaken = project.participants.some(participant => participant.role === role);
+    if (isRoleTaken) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'This role is already taken.' });
+    }
+
+    //checking if user has already applied for any role in this project
+    const alreadyApplied = project.applicants.some(applicant => applicant.user.toString() === userId);
+    if (alreadyApplied) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Already applied' });
+    }
+
+    //adding the user to the project's applicants list
+    project.applicants.push({ user: userId, role: role });
+    await project.save();
+
+    //adding the project to the user's appliedProjects list
+    const user = await User.findById(userId);
+    if (!user) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
+    }
+    user.appliedProjects.push({ project: projectId, role: role });
+    await user.save();
+
+    //TO DO: notification
+    res.status(StatusCodes.OK).json({ message: 'Application submitted' });
+});
+
+const approveApplicant = asyncWrapper(async (req, res, next) => {
+    const { projectId, applicationId } = req.params;
+    const userId = req.user.userId; 
+    console.log(applicationId)
+    
+    const project = await Project.findById(projectId);
+    if (!project) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    if (project.createdBy.toString() !== userId) {
+        return res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have permission to delete this project.' });
+    }
+
+    //finding the applicant entry using the applicationId
+    const applicantEntry = project.applicants.find(applicant => applicant._id.toString() === applicationId);
+    if (!applicantEntry) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Application not found' });
+    }
+
+    //checking if user has already applied for any role in this project
+    const alreadyApproved = project.participants.some(participant => participant.user.toString() === applicantEntry.user);
+    if (alreadyApproved) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Already approved' });
+    }
+
+    //moving the applicant to the project's participants list, removing from the applicants' one
+    project.participants.push({ user: applicantEntry.user, role: applicantEntry.role });
+    project.applicants = project.applicants.filter(applicant => applicant._id.toString() !== applicationId);
+    await project.save();
+
+    //finding the user by the id of the application entry
+    const user = await User.findById(applicantEntry.user);
+    if (!user) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
+    }
+    
+    //removing from appliedProjects and add to participatingProjects
+    user.appliedProjects = user.appliedProjects.filter(ap => ap.project.toString() !== projectId);
+    user.participatingProjects.push({ project: projectId, role: applicantEntry.role });
+    await user.save();
+
+    res.status(StatusCodes.OK).json({ message: 'Applicant approved' });
+});
+
+const rejectApplicant = asyncWrapper(async (req, res, next) => {
+    const { projectId, applicationId } = req.params; 
+    const userId = req.user.userId;
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    if (project.createdBy.toString() !== userId && !project.applicants.some(applicant => applicant.user.toString() === applicationId && applicant.user.toString() === userId)) {
+        return res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have permission to modify this project.' });
+    }
+
+    //finding the application entry using the applicationId
+    const applicantEntry = project.applicants.find(applicant => applicant._id.toString() === applicationId);
+    if (!applicantEntry) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Application not found' });
+    }
+
+    //removing the applicant from the applicants list
+    project.applicants = project.applicants.filter(applicant => applicant._id.toString() !== applicationId);
+    await project.save();
+
+    //updating the user's appliedProjects list to remove this project
+    const user = await User.findById(applicantEntry.user);
+    if (!user) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
+    }
+
+    user.appliedProjects = user.appliedProjects.filter(ap => ap.project.toString() !== projectId);
+    await user.save();
+
+    res.status(StatusCodes.OK).json({ message: 'Applicant rejected' });
+});
+
+
+const removeParticipant = asyncWrapper(async (req, res, next) => {
+    const { projectId, participantId } = req.params; 
+    const userId = req.user.userId; 
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    //checking if the requester is the project creator
+    if (project.createdBy.toString() !== userId) {
+        return res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have permission to remove participants from this project.' });
+    }
+
+    //checking if the participant is actually part of the project
+    const isParticipant = project.participants.some(participant => participant.user.toString() === participantId);
+    if (!isParticipant) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Participant not found in this project' });
+    }
+
+    //removing the participant
+    project.participants = project.participants.filter(participant => participant.user.toString() !== participantId);
+    await project.save();
+
+    //updating the user's document to reflect that they are no longer participating in this project
+    const user = await User.findById(participantId);
+    if (!user) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
+    }
+
+    user.participatingProjects = user.participatingProjects.filter(participation => participation.project.toString() !== projectId);
+    await user.save();
+
+    res.status(StatusCodes.OK).json({ message: 'Participant removed successfully' });
+});
+
+
 module.exports =  { 
     displaySearchProjects,
     getProjectDetails,
@@ -340,5 +506,9 @@ module.exports =  {
     createProject,
     editProject,
     deleteProject,
-    toggleLike
+    toggleLike,
+    applyToParticipate,
+    approveApplicant,
+    rejectApplicant,
+    removeParticipant
 };
