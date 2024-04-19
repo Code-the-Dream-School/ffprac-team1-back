@@ -8,8 +8,8 @@ info:
 servers:
   - url: http://localhost:8000/api/v1
     description: Development server for the DevConnexion platform.
-
-
+  - url: https://dev-connexion-g6sv.onrender.com/api/v1
+    description: Production server for the DevConnexion platform.
 paths:
   /users/register:
     post:
