@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const { UnauthenticatedError } = require('../errors');
 
 const optionalAuthenticationMiddleware = async (req, res, next) => {
   const token = req.signedCookies.token;
