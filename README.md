@@ -10,7 +10,7 @@ This repository contains the **Node.js/Express server** code for our application
 - **User Registration and Login**: Secure user authentication using JSON Web Tokens (JWT), complete with cookie management for maintaining sessions.
 - - **Password Management**:
   - Features like password reset and secure handling through encryption using bcrypt.
-  - **Password Reset**: Offers a password reset functionality, where users can request to reset their password, and the system generates a secure reset token. The reset token is time-sensitive, enhancing security and minimizing potential abuse.
+  - Offers a password reset functionality, where users can request to reset their password, and the system generates a secure reset token. The reset token is time-sensitive, enhancing security and minimizing potential abuse.
 - **Session Management**: Secure logout capabilities ensuring user sessions are safely terminated.
 
 ### Profile Management
