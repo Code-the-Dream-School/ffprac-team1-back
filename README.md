@@ -10,6 +10,7 @@ This repository contains the **Node.js/Express server** code for our application
 2. [Key Features](#key-features)
 3. [Technologies Used](#technologies-used)
 4. [Quick Start](#quick-start)
+5. [Authors](#authors)
 
 ---
 ## Swagger Documentation
@@ -94,3 +95,11 @@ This application utilizes a variety of technologies and middleware for optimal p
 8. **Running Front-End:** After ensuring the back-end server is up, proceed to run the front-end application.
 
 ---
+
+## Authors
+
+- [Aigul Yedigeyeva](https://github.com/AigulY)
+- [Anna Solovykh](https://github.com/AnnaSolovykh)
+- [Daria Sidorko](https://github.com/DariaSidorko)
+- [Maria Doronkina](https://github.com/mariyador)
+- [Yelena Japarova](https://github.com/DYA13)
