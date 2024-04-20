@@ -46,7 +46,7 @@ app.use(cors({
 app.use(
     rateLimiter({
       windowMs: 15 * 60 * 1000, //15 minutes -  the time frame for rate limiting
-      max: 200, //limits each IP to 100 requests per window
+      max: 500, //limits each IP to 500 requests per window
     })
 ); //limits repeated requests to the endpoints
 app.use(mongoSanitize()); //sanitizes user inputs to prevent MongoDB injection attacks
