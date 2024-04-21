@@ -1,0 +1,873 @@
+openapi: 3.0.3
+info:
+  title: DevConnexion API
+  description: DevConnexion is a dynamic platform created for aspiring developers, web designers, testers, and creative technology enthusiasts. It serves as a nexus where technology meets creativity, facilitating a vibrant community-driven environment for professional growth and collaboration.
+  contact:
+    email: rapnuta@gmail.com
+  version: 1.0.11
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development server for the DevConnexion platform.
+  - url: https://dev-connexion-g6sv.onrender.com/api/v1
+    description: Production server for the DevConnexion platform.
+paths:
+  /users/register:
+    post:
+      tags:
+        - Users
+      summary: Register a new user
+      description: Creates a new user account with the provided details.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request, possibly user already exists
+        '500':
+          description: Internal server error
+
+  /users/login:
+    post:
+      tags:
+        - Users
+      summary: Log in a user
+      description: Logs in a user by verifying email and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthenticated, invalid email or password
+        '500':
+          description: Internal server error
+
+  /users/logout:
+    post:
+      tags:
+        - Users
+      summary: Log out a user
+      description: Logs out the current logged-in user session.
+      responses:
+        '200':
+          description: Logged out successfully
+        '500':
+          description: Internal server error
+
+  /users/reset-password:
+    post:
+      tags:
+        - Users
+      summary: Request a password reset
+      description: Sends a password reset link or token to the user's email if registered.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Password reset token sent successfully
+        '400':
+          description: Bad request, user not found
+        '500':
+          description: Internal server error
+
+  /profiles/myProfile:
+    get:
+      tags:
+        - Profiles
+      summary: Retrieve own profile
+      description: Fetches the profile of the currently authenticated user.
+      operationId: getOwnProfile
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized access
+        '404':
+          description: Profile not found
+
+    patch:
+      tags:
+        - Profiles
+      summary: Update own profile
+      description: Updates the profile details of the currently authenticated user.
+      operationId: updateUserProfile
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                about:
+                  type: string
+                title:
+                  type: string
+                contacts:
+                  type: object
+                  properties:
+                    linkedIn:
+                      type: string
+                      format: uri
+                    github:
+                      type: string
+                      format: uri
+                    portfolioWebsite:
+                      type: string
+                      format: uri
+                profilePicture:
+                  type: string
+                  format: binary
+                  description: File to upload as profile picture
+                coverProfilePicture:
+                  type: string
+                  format: binary
+                  description: File to upload as cover profile picture
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request, invalid input
+        '401':
+          description: Unauthorized access
+        '500':
+          description: Internal server error
+
+  /profiles/{userId}:
+    get:
+      tags:
+        - Profiles
+      summary: Retrieve user profile by ID
+      description: Fetches the profile of a user by their unique identifier.
+      operationId: getUserProfile
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the user whose profile is being retrieved
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized access
+        '404':
+          description: User not found
+  /projects:
+    get:
+      tags:
+        - Projects
+      summary: Display search projects
+      description: Retrieves projects based on search criteria. Authentication is optional but recommended
+        because additional data is provided if the user is authenticated.
+      operationId: displaySearchProjects
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search query to filter projects.
+      responses:
+        '200':
+          description: List of projects matching search criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+    post:
+      tags:
+        - Projects
+      summary: Create a new project
+      description: Allows authenticated users to create a new project.
+      operationId: createProject
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '201':
+          description: Project created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          description: Validation error
+
+  /projects/suggestions:
+    get:
+      tags:
+        - Projects
+      summary: Suggest search words
+      description: Provides search word suggestions based on a query.
+      operationId: suggestSearchWord
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Query for which suggestions are needed.
+      responses:
+        '200':
+          description: Successful response with search word suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /projects/{projectId}:
+    get:
+      tags:
+        - Projects
+      summary: Get project details
+      description: Retrieves details of a specific project. Authentication is optional but recommended
+        because additional data is provided if the user is authenticated.
+      operationId: getProjectDetails
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the project.
+      responses:
+        '200':
+          description: Project details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+    patch:
+      tags:
+        - Projects
+      summary: Edit a project
+      description: Allows project creator to edit project details.
+      operationId: editProject
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the project to be edited.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Project updated successfully
+        '403':
+          description: Forbidden access
+    delete:
+      tags:
+        - Projects
+      summary: Delete a project
+      description: Allows project creator to delete a project.
+      operationId: deleteProject
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the project to be deleted.
+      responses:
+        '200':
+          description: Project deleted successfully
+        '403':
+          description: Forbidden access
+
+  /projects/{projectId}/like:
+    patch:
+      tags:
+        - Projects
+      summary: Toggle like on a project
+      description: Allows authenticated users to toggle a like on a project.
+      operationId: toggleLike
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the project to be liked or unliked.
+      responses:
+        '200':
+          description: Like status toggled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  liked:
+                    type: boolean
+                  totalLikes:
+                    type: integer
+
+  /projects/{projectId}/apply:
+    post:
+      tags:
+        - Projects
+      summary: Apply to participate in a project
+      description: Allows authenticated users to apply for a role in a project.
+      operationId: applyToParticipate
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the project to apply for.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum:
+                    - Mentor
+                    - Frontend Developer
+                    - Backend Developer
+                    - Fullstack Developer
+                    - Team Lead
+                    - UI/UX Designer
+                    - Project Manager
+                    - DevOps Engineer
+                    - Quality Assurance Engineer
+      responses:
+        '200':
+          description: Application submitted successfully
+        '400':
+          description: Bad request, invalid role
+
+  /projects/{projectId}/approve/{applicationId}:
+    post:
+      tags:
+        - Projects
+      summary: Approve an application to participate in a project
+      description: Allows project creator to approve an applicant's participation in a project.
+      operationId: approveApplicant
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the project.
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the application to approve.
+      responses:
+        '200':
+          description: Applicant approved successfully
+        '403':
+          description: Forbidden access
+
+  /projects/{projectId}/reject/{applicationId}:
+    post:
+      tags:
+        - Projects
+      summary: Reject an application to participate in a project
+      description: Allows project creator to reject an applicant's participation in a project.
+      operationId: rejectApplicant
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the project.
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the application to reject.
+      responses:
+        '200':
+          description: Applicant rejected successfully
+        '403':
+          description: Forbidden access
+
+  /projects/{projectId}/participants/{participantId}:
+    delete:
+      tags:
+        - Projects
+      summary: Remove a participant from a project
+      description: Allows project creator to remove a participant from a project.
+      operationId: removeParticipant
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the project.
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the participant to remove.
+      responses:
+        '200':
+          description: Participant removed successfully
+        '403':
+          description: Forbidden access
+
+components:
+  securitySchemes:
+    cookieAuth:  
+      type: apiKey
+      in: cookie 
+      name: token  
+      description: |
+        This API uses a cookie-based authentication method. Obtain the `token` value by logging in through the
+        API's login endpoint. Upon successful authentication, the server will set a cookie named `token` which should
+        be included in subsequent requests to access protected endpoints. Use the browser's developer tools to
+        inspect cookies and retrieve the value for testing purposes here in Swagger.
+  schemas:
+    User:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+      properties:
+        firstName:
+          type: string
+          minLength: 2
+          maxLength: 30
+          example: John
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 30
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: dev.connexion@example.com
+        password:
+          type: string
+          format: password
+          minLength: 6
+        passwordResetToken:
+          type: string
+          nullable: true
+        passwordResetTokenExpiry:
+          type: string
+          format: date-time
+          nullable: true
+        profilePictureUrl:
+          type: string
+          format: uri
+          default: 'https://images.unsplash.com/photo-1633409361618-c73427e4e206?ixlib=rb-4.0.3'
+        profileCoverPictureUrl:
+          type: string
+          format: uri
+          default: 'https://images.unsplash.com/photo-1491895200222-0fc4a4c35e18?ixlib=rb-4.0.3'
+        contacts:
+          type: object
+          properties:
+            linkedIn:
+              type: string
+              format: uri
+              nullable: true
+            github:
+              type: string
+              format: uri
+              nullable: true
+            portfolioWebsite:
+              type: string
+              format: uri
+              nullable: true
+        about:
+          type: string
+          maxLength: 500
+        offer:
+          type: string
+          maxLength: 500
+        watchList:
+          type: array
+          items:
+            type: string
+            format: uuid
+        ownProjects:
+          type: array
+          items:
+            type: string
+            format: uuid
+        participatingProjects:
+          type: array
+          items:
+            type: object
+            required:
+              - project
+              - role
+            properties:
+              project:
+                type: string
+                format: uuid
+              role:
+                type: string
+                enum:
+                  - Mentor
+                  - Frontend Developer
+                  - Backend Developer
+                  - Fullstack Developer
+                  - Team Lead
+                  - UI/UX Designer
+                  - Project Manager
+                  - DevOps Engineer
+                  - Quality Assurance Engineer
+        appliedProjects:
+          type: array
+          items:
+            type: object
+            required:
+              - project
+              - role
+            properties:
+              project:
+                type: string
+                format: uuid
+              role:
+                type: string
+                enum:
+                  - Mentor
+                  - Frontend Developer
+                  - Backend Developer
+                  - Fullstack Developer
+                  - Team Lead
+                  - UI/UX Designer
+                  - Project Manager
+                  - DevOps Engineer
+                  - Quality Assurance Engineer
+
+    Project:
+      type: object
+      required:
+        - title
+        - description
+        - status
+        - createdBy
+      properties:
+        title:
+          type: string
+          maxLength: 100
+          description: 'Title of the project, not exceeding 100 characters.'
+        description:
+          type: string
+          maxLength: 700
+          description: 'Detailed description of the project, not exceeding 700 characters.'
+        status:
+          type: string
+          enum:
+            - Seeking Team Members
+            - In Progress
+            - Completed
+          default: Seeking Team Members
+        technologies:
+          $ref: '#/components/schemas/Technologies'
+        rolesNeeded:
+          type: array
+          items:
+            type: string
+            enum:
+              - Mentor
+              - Frontend Developer
+              - Backend Developer
+              - Fullstack Developer
+              - Team Lead
+              - UI/UX Designer
+              - Project Manager
+              - DevOps Engineer
+              - Quality Assurance Engineer
+        likeCount:
+          type: integer
+          default: 0
+          description: 'Total number of likes this project has received.'
+        applicants:
+          type: array
+          items:
+            type: object
+            required:
+              - user
+              - role
+            properties:
+              user:
+                type: string
+                format: uuid
+                description: Identifier of the user who applied.
+              role:
+                type: string
+                enum:
+                  - Mentor
+                  - Frontend Developer
+                  - Backend Developer
+                  - Fullstack Developer
+                  - Team Lead
+                  - UI/UX Designer
+                  - Project Manager
+                  - DevOps Engineer
+                  - Quality Assurance Engineer
+                description: Role applied for in the project.
+        participants:
+          type: array
+          items:
+            type: object
+            required:
+              - user
+              - role
+            properties:
+              user:
+                type: string
+                format: uuid
+                description: Identifier of the user who is participating.
+              role:
+                type: string
+                enum:
+                  - Mentor
+                  - Frontend Developer
+                  - Backend Developer
+                  - Fullstack Developer
+                  - Team Lead
+                  - UI/UX Designer
+                  - Project Manager
+                  - DevOps Engineer
+                  - Quality Assurance Engineer
+                description: Role of the user in the project.
+        projectPictureUrl:
+          type: string
+          format: uri
+        projectCoverPictureUrl:
+          type: string
+          format: uri
+        createdBy:
+          type: string
+          format: uuid
+          description: 'Identifier of the user who created the project.'
+    
+    Technologies:
+      type: object
+      properties:
+        frontend:
+          type: array
+          items:
+            type: string
+            enum:
+              - HTML/CSS
+              - JavaScript
+              - TypeScript
+              - React
+              - Angular
+              - Vue.js
+              - Svelte
+              - Next.js
+              - Redux
+              - Bootstrap
+              - Tailwind CSS
+              - SASS/LESS
+        backend:
+          type: array
+          items:
+            type: string
+            enum:
+              - Node.js
+              - Express.js
+              - Django
+              - Ruby on Rails
+              - Java
+              - PHP Laravel
+              - Kotlin
+              - Go
+              - C#
+        design:
+          type: array
+          items:
+            type: string
+            enum:
+              - Adobe XD
+              - Sketch
+              - Figma
+              - InVision
+              - Photoshop
+              - Illustrator
+        projectManagement:
+          type: array
+          items:
+            type: string
+            enum:
+              - Jira
+              - Trello
+              - Asana
+              - Confluence
+              - Linear
+        devOps:
+          type: array
+          items:
+            type: string
+            enum:
+              - Docker
+              - AWS
+              - Azure
+              - GCP
+              - Jenkins
+              - GitHub Actions
+              - GitLab CI/CD
+        qualityAssurance:
+          type: array
+          items:
+            type: string
+            enum:
+              - Selenium
+              - Jest
+              - Mocha
+              - Chai
+              - Cypress
+              - Postman
+              - JMeter
+        database:
+          type: array
+          items:
+            type: string
+            enum:
+              - SQL
+              - NoSQL
+              - PostgreSQL
+              - MySQL
+              - SQLite
+              - MongoDB
+              - Cassandra
+    ProjectLike:
+      type: object
+      required:
+        - projectId
+        - userId
+      properties:
+        projectId:
+          type: string
+          format: uuid
+          description: "The unique identifier of the project that was liked."
+        userId:
+          type: string
+          format: uuid
+          description: "The unique identifier of the user who liked the project."
+        likedAt:
+          type: string
+          format: date-time
+          description: "The date and time when the like was recorded."
+          default: "The current timestamp when the object is created."
