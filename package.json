@@ -1,10 +1,11 @@
 {
-  "name": "bb-practicum-team-1-back",
+  "name": "ff-practicum-team-1-back",
   "version": "1.0.0",
-  "description": "Back-End Repo for Team 1 of Baboon/Bald Eagle Practicum",
+  "description": "Back-End Repo for Dev.Connexion",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "prettify": "prettier --write '**/*.{js,json,css,md}'"
   },
   "author": "",
   "license": "ISC",
@@ -32,6 +33,17 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "nodemon": "^3.1.0",
+    "prettier": "^3.2.5"
+  },
+  "lint-staged": {
+    "*.{js,json,css,md}": "prettier --write"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
