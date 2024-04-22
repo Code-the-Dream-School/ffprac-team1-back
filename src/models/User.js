@@ -54,7 +54,7 @@ const UserSchema = new mongoose.Schema(
     },
     profilePictureUrl: {
       type: String,
-      default: 'https://images.unsplash.com/photo-1633409361618-c73427e4e206?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTcwNzkzNDI4Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080',
+      default: 'https://res.cloudinary.com/dqhoyu7rj/image/upload/v1713736654/Default_Images/ozh3szm1p8vh4ikxap1y.jpg',
       validate: [validateURL, "Please provide a valid URL."]
     },
     profilePicturePublicId: {
@@ -63,7 +63,7 @@ const UserSchema = new mongoose.Schema(
     },
     profileCoverPictureUrl: {
       type: String,
-      default: 'https://images.unsplash.com/photo-1491895200222-0fc4a4c35e18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY5OTYzNjc1Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080',
+      default: 'https://res.cloudinary.com/dqhoyu7rj/image/upload/v1713736654/Default_Images/cjk7odtys56mrudarbnq.jpg',
       validate: [validateURL, "Please provide a valid URL."]
     },
     profileCoverPicturePublicId: {
