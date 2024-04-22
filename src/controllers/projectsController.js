@@ -190,6 +190,10 @@ const createProject = asyncWrapper(async (req, res, next) => {
   delete projectData.applicants;
   delete projectData.participants;
 
+  if (!projectData.technologies) {
+    projectData.technologies = {};
+  }
+
   const project = await Project.create(projectData);
 
   await User.findByIdAndUpdate(createdBy, { $push: { ownProjects: project._id } });
@@ -282,11 +286,11 @@ const deleteProject = asyncWrapper(async (req, res, next) => {
     return res.status(StatusCodes.FORBIDDEN).json({ message: "You do not have permission to delete this project." });
   }
 
-  if (project.projectPicturePublicId) {
+  if (project.projectPicturePublicId !== "default_project_image") {
     await cloudinary.v2.uploader.destroy(project.projectPicturePublicId);
   }
 
-  if (project.projectCoverPicturePublicId) {
+  if (project.projectCoverPicturePublicId !== "default_project_cover_image") {
     await cloudinary.v2.uploader.destroy(project.projectCoverPicturePublicId);
   }
 
