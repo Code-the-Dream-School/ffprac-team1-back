@@ -56,7 +56,6 @@ const updateUserProfile = asyncWrapper(async (req, res) => {
       updateData["profilePictureUrl"] = profilePictureResponse.secure_url;
       updateData["profilePicturePublicId"] = profilePictureResponse.public_id;
     } catch (error) {
-      console.error("Error uploading to Cloudinary:", error);
       return res.status(500).json({ message: "Failed to upload image", error: error.message });
     }
   }
@@ -72,7 +71,6 @@ const updateUserProfile = asyncWrapper(async (req, res) => {
       updateData["profileCoverPictureUrl"] = profileCoverPictureResponse.secure_url;
       updateData["profileCoverPicturePublicId"] = profileCoverPictureResponse.public_id;
     } catch {
-      console.error("Error uploading to Cloudinary:", error);
       return res.status(500).json({ message: "Failed to upload cover image", error: error.message });
     }
   }

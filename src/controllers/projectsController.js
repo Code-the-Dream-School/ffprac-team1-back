@@ -240,7 +240,6 @@ const editProject = asyncWrapper(async (req, res, next) => {
       updateData["projectPictureUrl"] = projectPictureResponse.secure_url;
       updateData["projectPicturePublicId"] = projectPictureResponse.public_id;
     } catch (error) {
-      console.error("Error uploading to Cloudinary:", error);
       return res.status(500).json({ message: "Failed to upload image", error: error.message });
     }
   }
@@ -256,7 +255,6 @@ const editProject = asyncWrapper(async (req, res, next) => {
       updateData["projectCoverPictureUrl"] = coverPictureResponse.secure_url;
       updateData["projectCoverPicturePublicId"] = coverPictureResponse.public_id;
     } catch {
-      console.error("Error uploading to Cloudinary:", error);
       return res.status(500).json({ message: "Failed to upload cover image", error: error.message });
     }
   }
@@ -382,7 +380,6 @@ const applyToParticipate = asyncWrapper(async (req, res, next) => {
 const approveApplicant = asyncWrapper(async (req, res, next) => {
   const { projectId, applicationId } = req.params;
   const userId = req.user.userId;
-  console.log(applicationId);
 
   const project = await Project.findById(projectId);
   if (!project) {

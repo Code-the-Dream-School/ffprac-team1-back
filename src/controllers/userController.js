@@ -7,7 +7,6 @@ const generateToken = require("../util/generateToken");
 const attachCookiesToResponse = require("../util/attachCookiesToResponse");
 const registerUser = async (req, res) => {
   try {
-    console.log("Request Body:", req.body);
     const { email, password, firstName, lastName } = req.body;
 
     // check if user already exists
@@ -19,7 +18,6 @@ const registerUser = async (req, res) => {
     // Create a new user
     const newUser = new User({ email, password, firstName, lastName });
     await newUser.save();
-    console.log("User registered:", newUser);
 
     // Attach cookies to the response
     attachCookiesToResponse({ res, user: newUser });
@@ -34,7 +32,6 @@ const registerUser = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("Error registering user:", error);
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
     const errorMessage = error.message || "Error registering user";
     res.status(statusCode).json({ error: errorMessage });
@@ -72,7 +69,6 @@ const loginUser = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("Error logging in:", error);
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
     const errorMessage = error.message || "Error logging in";
     res.status(statusCode).json({ error: errorMessage });
@@ -88,7 +84,6 @@ const logoutUser = (req, res) => {
     });
     res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
   } catch (err) {
-    console.error("Error during logout:", err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Logout failed" });
   }
 };
@@ -115,7 +110,6 @@ const requestPasswordReset = async (req, res) => {
     await user.save();
     res.status(StatusCodes.OK).json({ response: "Your password has been reset successfully" });
   } catch (error) {
-    console.error("Error requesting password reset:", error);
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
     const errorMessage = error.message || "Error requesting password reset";
     res.status(statusCode).json({ error: errorMessage });
