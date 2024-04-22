@@ -1,7 +1,7 @@
-process.setMaxListeners(15)
+process.setMaxListeners(15);
 
-const { PORT = 8000 } = process.env
-const app = require("./app")
+const { PORT = 8000 } = process.env;
+const app = require("./app");
 
-const listener = () => console.log(`Listening on Port ${PORT}!`)
-app.listen(PORT, listener)
+const listener = () => console.log(`Listening on Port ${PORT}!`);
+app.listen(PORT, listener);

@@ -1,15 +1,15 @@
-const mongoose = require("mongoose")
-const bcrypt = require("bcrypt")
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const urlValidationPattern =
-  /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})$/
+  /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})$/;
 
-const validateURL = (url) => {
-  if (!url) { 
+const validateURL = url => {
+  if (!url) {
     return true;
   }
   return urlValidationPattern.test(url);
-}
+};
 
 const UserSchema = new mongoose.Schema(
   {
@@ -39,7 +39,7 @@ const UserSchema = new mongoose.Schema(
       required: [true, "Please provide your password"],
       validate: {
         validator: function (password) {
-          return password.length >= 6
+          return password.length >= 6;
         },
         message: "Password should be at least 6 characters long"
       }
@@ -54,21 +54,21 @@ const UserSchema = new mongoose.Schema(
     },
     profilePictureUrl: {
       type: String,
-      default: 'https://images.unsplash.com/photo-1633409361618-c73427e4e206?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTcwNzkzNDI4Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080',
+      default: "https://res.cloudinary.com/dqhoyu7rj/image/upload/v1713736654/Default_Images/ozh3szm1p8vh4ikxap1y.jpg",
       validate: [validateURL, "Please provide a valid URL."]
     },
     profilePicturePublicId: {
       type: String,
-      default: 'default_profile_image'
+      default: "default_profile_image"
     },
     profileCoverPictureUrl: {
       type: String,
-      default: 'https://images.unsplash.com/photo-1491895200222-0fc4a4c35e18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY5OTYzNjc1Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080',
+      default: "https://res.cloudinary.com/dqhoyu7rj/image/upload/v1713736654/Default_Images/cjk7odtys56mrudarbnq.jpg",
       validate: [validateURL, "Please provide a valid URL."]
     },
     profileCoverPicturePublicId: {
       type: String,
-      default: 'default_profile_cover_image'
+      default: "default_profile_cover_image"
     },
     watchList: [
       {
@@ -115,7 +115,8 @@ const UserSchema = new mongoose.Schema(
         ref: "Project"
       }
     ],
-    participatingProjects: [{
+    participatingProjects: [
+      {
         project: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Project"
@@ -124,54 +125,57 @@ const UserSchema = new mongoose.Schema(
           type: String,
           required: true,
           enum: [
-              "Mentor",
-              "Frontend Developer", 
-              "Backend Developer", 
-              "Fullstack Developer", 
-              "Team Lead",
-              "UI/UX Designer", 
-              "Project Manager", 
-              "DevOps Engineer", 
-              "Quality Assurance Engineer"
+            "Mentor",
+            "Frontend Developer",
+            "Backend Developer",
+            "Fullstack Developer",
+            "Team Lead",
+            "UI/UX Designer",
+            "Project Manager",
+            "DevOps Engineer",
+            "Quality Assurance Engineer"
           ]
         }
-      }],
-    appliedProjects: [{
-      project: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Project"
-      },
-      role: {
-        type: String,
-        required: true,
-        enum: [
-            "Mentor",
-            "Frontend Developer", 
-            "Backend Developer", 
-            "Fullstack Developer", 
-            "Team Lead",
-            "UI/UX Designer", 
-            "Project Manager", 
-            "DevOps Engineer", 
-            "Quality Assurance Engineer"
-        ]
       }
-    }],
+    ],
+    appliedProjects: [
+      {
+        project: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Project"
+        },
+        role: {
+          type: String,
+          required: true,
+          enum: [
+            "Mentor",
+            "Frontend Developer",
+            "Backend Developer",
+            "Fullstack Developer",
+            "Team Lead",
+            "UI/UX Designer",
+            "Project Manager",
+            "DevOps Engineer",
+            "Quality Assurance Engineer"
+          ]
+        }
+      }
+    ]
   },
   { timestamps: true }
-)
+);
 
 // Hash the password before saving
 UserSchema.pre("save", async function (next) {
-  const user = this
-  if (!user.isModified("password")) return next()
+  const user = this;
+  if (!user.isModified("password")) return next();
 
-  const salt = await bcrypt.genSalt(10)
-  const hash = await bcrypt.hash(user.password, salt)
-  user.password = hash
-  next()
-})
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(user.password, salt);
+  user.password = hash;
+  next();
+});
 
-const UserModel = mongoose.model("User", UserSchema, "Users")
+const UserModel = mongoose.model("User", UserSchema, "Users");
 
-module.exports = UserModel
+module.exports = UserModel;

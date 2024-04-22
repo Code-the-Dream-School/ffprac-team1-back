@@ -2,36 +2,66 @@
 
 const mongoose = require("mongoose");
 
-const TechnologiesSchema = new mongoose.Schema({
-  frontend: [{
-    type: String,
-    enum: ["HTML/CSS", "JavaScript", "TypeScript", "React", "Angular", "Vue.js", "Svelte", "Next.js", "Redux", "Bootstrap", "Tailwind CSS", "SASS/LESS"],
-  }],
-  backend: [{
-    type: String,
-    enum: ["Node.js", "Express.js", "Django", "Ruby on Rails", "Java", "PHP Laravel", "Kotlin", "Go", "C#"],
-  }],
-  design: [{
-    type: String,
-    enum: ["Adobe XD", "Sketch", "Figma", "InVision", "Photoshop", "Illustrator"],
-  }],
-  projectManagement: [{
-    type: String,
-    enum: ["Jira", "Trello", "Asana", "Confluence", "Linear"],
-  }],
-  devOps: [{
-    type: String,
-    enum: ["Docker", "AWS", "Azure", "GCP", "Jenkins", "GitHub Actions", "GitLab CI/CD"],
-  }],
-  qualityAssurance: [{
-    type: String,
-    enum: ["Selenium", "Jest", "Mocha", "Chai", "Cypress", "Postman", "JMeter"],
-  }],
-  database: [{
-    type: String,
-    enum: ["SQL", "NoSQL", "PostgreSQL", "MySQL", "SQLite", "MongoDB", "Cassandra"],
-  }],
-}, { _id: false }); 
+const TechnologiesSchema = new mongoose.Schema(
+  {
+    frontend: [
+      {
+        type: String,
+        enum: [
+          "HTML/CSS",
+          "JavaScript",
+          "TypeScript",
+          "React",
+          "Angular",
+          "Vue.js",
+          "Svelte",
+          "Next.js",
+          "Redux",
+          "Bootstrap",
+          "Tailwind CSS",
+          "SASS/LESS"
+        ]
+      }
+    ],
+    backend: [
+      {
+        type: String,
+        enum: ["Node.js", "Express.js", "Django", "Ruby on Rails", "Java", "PHP Laravel", "Kotlin", "Go", "C#"]
+      }
+    ],
+    design: [
+      {
+        type: String,
+        enum: ["Adobe XD", "Sketch", "Figma", "InVision", "Photoshop", "Illustrator"]
+      }
+    ],
+    projectManagement: [
+      {
+        type: String,
+        enum: ["Jira", "Trello", "Asana", "Confluence", "Linear"]
+      }
+    ],
+    devOps: [
+      {
+        type: String,
+        enum: ["Docker", "AWS", "Azure", "GCP", "Jenkins", "GitHub Actions", "GitLab CI/CD"]
+      }
+    ],
+    qualityAssurance: [
+      {
+        type: String,
+        enum: ["Selenium", "Jest", "Mocha", "Chai", "Cypress", "Postman", "JMeter"]
+      }
+    ],
+    database: [
+      {
+        type: String,
+        enum: ["SQL", "NoSQL", "PostgreSQL", "MySQL", "SQLite", "MongoDB", "Cassandra"]
+      }
+    ]
+  },
+  { _id: false }
+);
 
 module.exports = TechnologiesSchema;
 

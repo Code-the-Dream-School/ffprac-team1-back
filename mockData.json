@@ -13,12 +13,7 @@
       "qualityAssurance": ["Jest", "Cypress"],
       "database": ["MongoDB"]
     },
-    "rolesNeeded": [
-      "Backend Developer",
-      "UI/UX Designer",
-      "DevOps Engineer",
-      "Team Lead"
-    ],
+    "rolesNeeded": ["Backend Developer", "UI/UX Designer", "DevOps Engineer", "Team Lead"],
     "likes": 15
   },
   {
@@ -82,12 +77,7 @@
       "qualityAssurance": ["Selenium"],
       "database": ["MongoDB"]
     },
-    "rolesNeeded": [
-      "DevOps Engineer",
-      "Frontend Developer",
-      "Backend Developer",
-      "Quality Assurance Engineer"
-    ],
+    "rolesNeeded": ["DevOps Engineer", "Frontend Developer", "Backend Developer", "Quality Assurance Engineer"],
     "likes": 62
   }
 ]
