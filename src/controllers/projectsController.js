@@ -170,12 +170,14 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
         title: project.title,
         description: project.description,
         status: project.status,
-        likes: project.likes,
         technologies: project.technologies,
         rolesNeeded: project.rolesNeeded,
         createdBy: isAuthorized ? project.createdBy : null,
         participants: isAuthorized ? project.participants : null,
         applicants: isCreator ? project.applicants : null,
+        projectCoverPictureUrl: project.projectCoverPictureUrl,
+        projectPictureUrl: project.projectPictureUrl,
+        likeCount: project.likeCount
     };
 
     res.status(StatusCodes.OK).json({ project: response });
