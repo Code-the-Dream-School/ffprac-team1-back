@@ -71,6 +71,10 @@ This application utilizes a variety of technologies and middleware for optimal p
   - `morgan` - HTTP request logger middleware for node.js
   - `express-favicon` - Middleware to serve a favicon
   - `cloudinary` - Cloud service for storing images
+  - `prettier` - Code formatting tool to ensure code consistency.
+  - `husky` - Used to manage Git hooks for pre-commit actions.
+  - `lint-staged` - Runs prettier and other linters on staged files.
+
 - **Database and Routes:**
   - `connectDB` - Connects to MongoDB database
   - Routes for user, projects, and profiles management
