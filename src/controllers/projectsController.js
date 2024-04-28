@@ -164,6 +164,7 @@ const getProjectDetails = asyncWrapper(async (req, res, next) => {
   const isCreator = req.user && req.user.userId === project.createdBy.toString();
 
   let response = {
+    _id: project._id,
     title: project.title,
     description: project.description,
     status: project.status,
