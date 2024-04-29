@@ -1,6 +1,6 @@
 # DevConnexion: Back-End Repository
 
-Welcome to the back-end repository for **DevConnexion** — a platform created specifically for aspiring developers, web designers, and testers, among others. Here, at the intersection of technology and creativity, you embark on your exciting journey into professional development.
+Welcome to the back-end repository for **DevConnexion** — an innovative platform created to aspire developers, web designers, testers, and other IT professionals to showcase their projects and profiles. Our platform provides a dynamic environment where users can engage with and contribute to a thriving community of tech enthusiasts.
 
 This repository contains the **Node.js/Express server** code for our application, interfacing with our [Frontend Repository](https://github.com/Code-the-Dream-School/ffprac-team1-front/).
 
