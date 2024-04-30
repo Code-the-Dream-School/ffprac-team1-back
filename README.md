@@ -113,5 +113,5 @@ This application utilizes a variety of technologies and middleware for optimal p
 - [Aigul Yedigeyeva](https://github.com/AigulY)
 - [Anna Solovykh](https://github.com/AnnaSolovykh)
 - [Daria Sidorko](https://github.com/DariaSidorko)
-- [Maria Doronkina](https://github.com/mariyador)
+- [Mariya Doronkina](https://github.com/mariyador)
 - [Yelena Japarova](https://github.com/DYA13)
