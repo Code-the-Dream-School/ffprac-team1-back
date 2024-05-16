@@ -41,6 +41,7 @@ app.use(helmet()); //adds security headers to protect from vulnerabilities
 app.use(
   cors({
     origin: "http://localhost:3000",
+    origin: "https://devconnextionteam.onrender.com",
     credentials: true //allows sending cookies and credentials from client from specified origins
   })
 );
