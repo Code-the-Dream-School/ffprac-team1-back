@@ -12,7 +12,8 @@ const attachCookiesToResponse = ({ res, user }) => {
     httpOnly: true,
     expires: new Date(Date.now() + oneWeek),
     secure: process.env.NODE_ENV === "production",
-    signed: true
+    signed: true,
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax" //controls whether the cookie is sent with cross-site requests
   });
 };
 
