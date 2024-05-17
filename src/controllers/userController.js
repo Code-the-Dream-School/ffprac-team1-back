@@ -80,7 +80,10 @@ const logoutUser = (req, res) => {
     // Clear the 'token' cookie or session
     res.clearCookie("token", {
       httpOnly: true,
-      expires: new Date(Date.now())
+      expires: new Date(Date.now()),
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      path: "/"
     });
     res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
   } catch (err) {
