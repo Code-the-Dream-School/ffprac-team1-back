@@ -40,7 +40,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(helmet()); //adds security headers to protect from vulnerabilities
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://devconnextionteam.onrender.com"],
+    origin: ["http://localhost:3000", "https://devconnextionteam.onrender.com", "https://devconnextionteam-pr-105.onrender.com"],
     credentials: true //allows sending cookies and credentials from client from specified origins
   })
 );
